@@ -52,6 +52,21 @@ export interface GeneratedContent {
   exercises: Exercises;
 }
 
+export interface ReadingVocab {
+  word: string;
+  reading: string;
+  meaning: string;
+}
+
+export interface ReadingPassage {
+  title: string;
+  passage: string;
+  passageReading: string;
+  translation: string;
+  vocabulary: ReadingVocab[];
+  questions: MCQQuestion[];
+}
+
 export interface CorrectionFeedback {
   overallScore: number;
   correctedText: string;

@@ -12,6 +12,7 @@ import { GrammarSection } from "@/components/GrammarSection";
 import { ExerciseSection } from "@/components/ExerciseSection";
 import { ProfileModal } from "@/components/ProfileModal";
 import { KanjiGrid } from "@/components/KanjiGrid";
+import { ReadingSection } from "@/components/ReadingSection";
 
 export function StudyPageClient({
   lang,
@@ -31,7 +32,7 @@ export function StudyPageClient({
     "kanji" | "grammar" | "exercises" | null
   >(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [activeTab, setActiveTab] = useState<"session" | "dictionary">(
+  const [activeTab, setActiveTab] = useState<"session" | "reading" | "dictionary">(
     "session",
   );
 
@@ -122,6 +123,16 @@ export function StudyPageClient({
           }`}
         >
           {t.studySession}
+        </button>
+        <button
+          onClick={() => setActiveTab("reading")}
+          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
+            activeTab === "reading"
+              ? "bg-kurodo-red text-white"
+              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
+          }`}
+        >
+          {t.reading}
         </button>
         <button
           onClick={() => setActiveTab("dictionary")}
@@ -289,6 +300,11 @@ export function StudyPageClient({
             </div>
           )}
         </div>
+      )}
+
+      {/* Reading Tab */}
+      {activeTab === "reading" && (
+        <ReadingSection lang={lang} level={level} apiKey={apiKey} />
       )}
 
       {/* Kanji Dictionary Tab */}

@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { Language, JLPTLevel, GeneratedContent, CorrectionFeedback, KanjiVocab } from "./types";
+import { Language, JLPTLevel, GeneratedContent, CorrectionFeedback, KanjiVocab, ReadingPassage } from "./types";
 import { languageNames } from "./languages";
-import { buildPrompt, buildCorrectionPrompt, StudyHistory } from "./prompts";
+import { buildPrompt, buildCorrectionPrompt, buildReadingPrompt, StudyHistory } from "./prompts";
 
 function createClient(apiKey: string) {
   return new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
@@ -87,4 +87,18 @@ Rules:
 
   const data = JSON.parse(extractText(message));
   return data.vocabulary;
+}
+
+export async function generateReadingPassage(
+  apiKey: string,
+  lang: Language,
+  level: JLPTLevel,
+): Promise<ReadingPassage> {
+  const client = createClient(apiKey);
+  const message = await client.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 4096,
+    messages: [{ role: "user", content: buildReadingPrompt(lang, level) }],
+  });
+  return JSON.parse(extractText(message));
 }

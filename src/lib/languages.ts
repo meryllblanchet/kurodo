@@ -81,6 +81,15 @@ export const ui: Record<
     nextLevel: string;
     kanjiProgress: string;
     grammarProgress: string;
+    reading: string;
+    generateReading: string;
+    generatingReading: string;
+    showFurigana: string;
+    hideFurigana: string;
+    showTranslation: string;
+    hideTranslation: string;
+    keyVocabulary: string;
+    comprehension: string;
   }
 > = {
   en: {
@@ -139,6 +148,15 @@ export const ui: Record<
     nextLevel: "Next Level",
     kanjiProgress: "Kanji",
     grammarProgress: "Grammar",
+    reading: "Reading",
+    generateReading: "Generate Reading Passage",
+    generatingReading: "Generating...",
+    showFurigana: "Show Furigana",
+    hideFurigana: "Hide Furigana",
+    showTranslation: "Show Translation",
+    hideTranslation: "Hide Translation",
+    keyVocabulary: "Key Vocabulary",
+    comprehension: "Comprehension",
   },
   fr: {
     appTitle: "Kurodo",
@@ -196,6 +214,15 @@ export const ui: Record<
     nextLevel: "Niveau suivant",
     kanjiProgress: "Kanji",
     grammarProgress: "Grammaire",
+    reading: "Lecture",
+    generateReading: "Générer un texte de lecture",
+    generatingReading: "Génération en cours...",
+    showFurigana: "Afficher les furigana",
+    hideFurigana: "Masquer les furigana",
+    showTranslation: "Afficher la traduction",
+    hideTranslation: "Masquer la traduction",
+    keyVocabulary: "Vocabulaire clé",
+    comprehension: "Compréhension",
   },
   de: {
     appTitle: "Kurodo",
@@ -253,6 +280,15 @@ export const ui: Record<
     nextLevel: "Nächstes Level",
     kanjiProgress: "Kanji",
     grammarProgress: "Grammatik",
+    reading: "Lesen",
+    generateReading: "Lesetext generieren",
+    generatingReading: "Wird generiert...",
+    showFurigana: "Furigana anzeigen",
+    hideFurigana: "Furigana verbergen",
+    showTranslation: "Übersetzung anzeigen",
+    hideTranslation: "Übersetzung verbergen",
+    keyVocabulary: "Schlüsselvokabular",
+    comprehension: "Verständnis",
   },
   it: {
     appTitle: "Kurodo",
@@ -310,6 +346,15 @@ export const ui: Record<
     nextLevel: "Livello successivo",
     kanjiProgress: "Kanji",
     grammarProgress: "Grammatica",
+    reading: "Lettura",
+    generateReading: "Genera testo di lettura",
+    generatingReading: "Generazione in corso...",
+    showFurigana: "Mostra furigana",
+    hideFurigana: "Nascondi furigana",
+    showTranslation: "Mostra traduzione",
+    hideTranslation: "Nascondi traduzione",
+    keyVocabulary: "Vocabolario chiave",
+    comprehension: "Comprensione",
   },
   es: {
     appTitle: "Kurodo",
@@ -367,6 +412,15 @@ export const ui: Record<
     nextLevel: "Siguiente nivel",
     kanjiProgress: "Kanji",
     grammarProgress: "Gramática",
+    reading: "Lectura",
+    generateReading: "Generar texto de lectura",
+    generatingReading: "Generando...",
+    showFurigana: "Mostrar furigana",
+    hideFurigana: "Ocultar furigana",
+    showTranslation: "Mostrar traducción",
+    hideTranslation: "Ocultar traducción",
+    keyVocabulary: "Vocabulario clave",
+    comprehension: "Comprensión",
   },
   pt: {
     appTitle: "Kurodo",
@@ -424,6 +478,15 @@ export const ui: Record<
     nextLevel: "Próximo nível",
     kanjiProgress: "Kanji",
     grammarProgress: "Gramática",
+    reading: "Leitura",
+    generateReading: "Gerar texto de leitura",
+    generatingReading: "Gerando...",
+    showFurigana: "Mostrar furigana",
+    hideFurigana: "Ocultar furigana",
+    showTranslation: "Mostrar tradução",
+    hideTranslation: "Ocultar tradução",
+    keyVocabulary: "Vocabulário-chave",
+    comprehension: "Compreensão",
   },
 };
 

@@ -13,6 +13,7 @@ import { ExerciseSection } from "@/components/ExerciseSection";
 import { ProfileModal } from "@/components/ProfileModal";
 import { KanjiGrid } from "@/components/KanjiGrid";
 import { ReadingSection } from "@/components/ReadingSection";
+import { ListeningSection } from "@/components/ListeningSection";
 
 export function StudyPageClient({
   lang,
@@ -29,7 +30,7 @@ export function StudyPageClient({
   const getHistory = useCallback(() => history, [history]);
   const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory);
   const [activeSection, setActiveSection] = useState<
-    "kanji" | "grammar" | "exercises" | "reading" | null
+    "kanji" | "grammar" | "exercises" | "reading" | "listening" | null
   >(null);
   const [showProfile, setShowProfile] = useState(false);
   const [activeTab, setActiveTab] = useState<"session" | "dictionary">(
@@ -246,6 +247,11 @@ export function StudyPageClient({
                     label: t.reading,
                     icon: "読",
                   },
+                  {
+                    key: "listening" as const,
+                    label: t.listening,
+                    icon: "聴",
+                  },
                 ] as const
               ).map((section) => (
                 <div key={section.key}>
@@ -291,6 +297,12 @@ export function StudyPageClient({
                       {section.key === "reading" && (
                         <ReadingSection
                           reading={data.reading}
+                          lang={lang}
+                        />
+                      )}
+                      {section.key === "listening" && (
+                        <ListeningSection
+                          listening={data.listening}
                           lang={lang}
                         />
                       )}

@@ -90,6 +90,12 @@ export const ui: Record<
     hideTranslation: string;
     keyVocabulary: string;
     comprehension: string;
+    listening: string;
+    playAudio: string;
+    pauseAudio: string;
+    showTranscript: string;
+    hideTranscript: string;
+    situation: string;
   }
 > = {
   en: {
@@ -157,6 +163,12 @@ export const ui: Record<
     hideTranslation: "Hide Translation",
     keyVocabulary: "Key Vocabulary",
     comprehension: "Comprehension",
+    listening: "Listening",
+    playAudio: "Play",
+    pauseAudio: "Pause",
+    showTranscript: "Show Transcript",
+    hideTranscript: "Hide Transcript",
+    situation: "Situation",
   },
   fr: {
     appTitle: "Kurodo",
@@ -223,6 +235,12 @@ export const ui: Record<
     hideTranslation: "Masquer la traduction",
     keyVocabulary: "Vocabulaire clé",
     comprehension: "Compréhension",
+    listening: "Écoute",
+    playAudio: "Lecture",
+    pauseAudio: "Pause",
+    showTranscript: "Afficher la transcription",
+    hideTranscript: "Masquer la transcription",
+    situation: "Situation",
   },
   de: {
     appTitle: "Kurodo",
@@ -289,6 +307,12 @@ export const ui: Record<
     hideTranslation: "Übersetzung verbergen",
     keyVocabulary: "Schlüsselvokabular",
     comprehension: "Verständnis",
+    listening: "Hören",
+    playAudio: "Abspielen",
+    pauseAudio: "Pause",
+    showTranscript: "Transkript anzeigen",
+    hideTranscript: "Transkript verbergen",
+    situation: "Situation",
   },
   it: {
     appTitle: "Kurodo",
@@ -355,6 +379,12 @@ export const ui: Record<
     hideTranslation: "Nascondi traduzione",
     keyVocabulary: "Vocabolario chiave",
     comprehension: "Comprensione",
+    listening: "Ascolto",
+    playAudio: "Riproduci",
+    pauseAudio: "Pausa",
+    showTranscript: "Mostra trascrizione",
+    hideTranscript: "Nascondi trascrizione",
+    situation: "Situazione",
   },
   es: {
     appTitle: "Kurodo",
@@ -421,6 +451,12 @@ export const ui: Record<
     hideTranslation: "Ocultar traducción",
     keyVocabulary: "Vocabulario clave",
     comprehension: "Comprensión",
+    listening: "Escucha",
+    playAudio: "Reproducir",
+    pauseAudio: "Pausa",
+    showTranscript: "Mostrar transcripción",
+    hideTranscript: "Ocultar transcripción",
+    situation: "Situación",
   },
   pt: {
     appTitle: "Kurodo",
@@ -487,6 +523,12 @@ export const ui: Record<
     hideTranslation: "Ocultar tradução",
     keyVocabulary: "Vocabulário-chave",
     comprehension: "Compreensão",
+    listening: "Audição",
+    playAudio: "Reproduzir",
+    pauseAudio: "Pausa",
+    showTranscript: "Mostrar transcrição",
+    hideTranscript: "Ocultar transcrição",
+    situation: "Situação",
   },
 };
 

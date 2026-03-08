@@ -1,0 +1,275 @@
+"use client";
+
+import { useState, useRef, useCallback } from "react";
+import { Language, ListeningPassage } from "@/lib/types";
+import { ui } from "@/lib/languages";
+
+function MCQQuestion({
+  question,
+  choices,
+  correctIndex,
+  lang,
+}: {
+  question: string;
+  choices: [string, string, string, string];
+  correctIndex: number;
+  lang: Language;
+}) {
+  const t = ui[lang];
+  const [selected, setSelected] = useState<number | null>(null);
+
+  return (
+    <div className="px-4 py-4 rounded-lg bg-kurodo-deep/50 border border-white/5">
+      <p className="text-white font-medium mb-3">{question}</p>
+      <div className="grid grid-cols-1 gap-2">
+        {choices.map((choice, i) => {
+          let style =
+            "px-4 py-3 rounded-lg border text-left transition-all duration-200 text-sm ";
+          if (selected === null) {
+            style +=
+              "border-white/10 text-white/80 hover:border-kurodo-red/40 hover:bg-kurodo-ink active:bg-kurodo-ink";
+          } else if (i === correctIndex) {
+            style += "border-green-500/50 bg-green-500/10 text-green-400";
+          } else if (i === selected) {
+            style += "border-red-500/50 bg-red-500/10 text-red-400";
+          } else {
+            style += "border-white/5 text-white/30";
+          }
+
+          return (
+            <button
+              key={i}
+              onClick={() => selected === null && setSelected(i)}
+              className={style}
+            >
+              {choice}
+            </button>
+          );
+        })}
+      </div>
+      {selected !== null && (
+        <p
+          className={`mt-2 text-sm font-medium ${selected === correctIndex ? "text-green-400" : "text-red-400"}`}
+        >
+          {selected === correctIndex ? t.correct : t.incorrect}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function ListeningSection({
+  listening,
+  lang,
+}: {
+  listening: ListeningPassage;
+  lang: Language;
+}) {
+  const t = ui[lang];
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentLine, setCurrentLine] = useState(-1);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const lineIndexRef = useRef(0);
+
+  const stop = useCallback(() => {
+    window.speechSynthesis.cancel();
+    setIsPlaying(false);
+    setCurrentLine(-1);
+    lineIndexRef.current = 0;
+  }, []);
+
+  const play = useCallback(() => {
+    if (isPlaying) {
+      stop();
+      return;
+    }
+
+    const synth = window.speechSynthesis;
+    synth.cancel();
+
+    const voices = synth.getVoices();
+    const jpVoice = voices.find(
+      (v) => v.lang.startsWith("ja") && v.localService,
+    ) || voices.find((v) => v.lang.startsWith("ja"));
+
+    setIsPlaying(true);
+    lineIndexRef.current = 0;
+
+    function speakLine(index: number) {
+      if (index >= listening.dialogue.length) {
+        setIsPlaying(false);
+        setCurrentLine(-1);
+        return;
+      }
+
+      setCurrentLine(index);
+      const line = listening.dialogue[index];
+      const utt = new SpeechSynthesisUtterance(line.japanese);
+      utt.lang = "ja-JP";
+      if (jpVoice) utt.voice = jpVoice;
+      utt.rate = 0.85;
+
+      utt.onend = () => {
+        lineIndexRef.current = index + 1;
+        speakLine(index + 1);
+      };
+      utt.onerror = () => {
+        setIsPlaying(false);
+        setCurrentLine(-1);
+      };
+
+      utteranceRef.current = utt;
+      synth.speak(utt);
+    }
+
+    speakLine(0);
+  }, [isPlaying, listening.dialogue, stop]);
+
+  return (
+    <div className="animate-fade-in space-y-5">
+      {/* Title */}
+      <h2 className="text-lg font-bold text-kurodo-gold flex items-center gap-2">
+        <span className="text-kurodo-red">聴</span> {listening.title}
+      </h2>
+
+      {/* Situation */}
+      <p className="text-kurodo-muted text-sm italic">
+        {listening.situation}
+      </p>
+
+      {/* Play button */}
+      <button
+        onClick={play}
+        className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 ${
+          isPlaying
+            ? "bg-kurodo-card border border-kurodo-red/40 text-kurodo-red"
+            : "text-white"
+        }`}
+        style={
+          isPlaying
+            ? undefined
+            : { background: "linear-gradient(135deg, #C41E3A, #8B0000)" }
+        }
+      >
+        {isPlaying ? (
+          <>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+            {t.pauseAudio}
+          </>
+        ) : (
+          <>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            {t.playAudio}
+          </>
+        )}
+      </button>
+
+      {/* Transcript (hidden by default) */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowTranscript(!showTranscript)}
+          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+            showTranscript
+              ? "bg-kurodo-red text-white"
+              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
+          }`}
+        >
+          {showTranscript ? t.hideTranscript : t.showTranscript}
+        </button>
+        <button
+          onClick={() => setShowTranslation(!showTranslation)}
+          className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+            showTranslation
+              ? "bg-kurodo-red text-white"
+              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
+          }`}
+        >
+          {showTranslation ? t.hideTranslation : t.showTranslation}
+        </button>
+      </div>
+
+      {/* Dialogue transcript */}
+      {showTranscript && (
+        <div className="px-5 py-4 rounded-xl bg-kurodo-card border border-white/5 space-y-3 animate-fade-in">
+          {listening.dialogue.map((line, i) => (
+            <div
+              key={i}
+              className={`transition-all duration-300 ${
+                currentLine === i
+                  ? "border-l-2 border-kurodo-red pl-3"
+                  : "pl-4"
+              }`}
+            >
+              <span className="text-kurodo-gold text-xs font-medium">
+                {line.speaker}
+              </span>
+              <p className="text-white text-sm leading-relaxed">
+                {line.japanese}
+              </p>
+              <p className="text-kurodo-muted text-xs">{line.reading}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Translation */}
+      {showTranslation && (
+        <div className="px-4 py-4 rounded-xl bg-kurodo-deep/50 border border-white/5 animate-fade-in">
+          <p className="text-white/80 text-sm leading-relaxed">
+            {listening.translation}
+          </p>
+        </div>
+      )}
+
+      {/* Vocabulary */}
+      <div>
+        <h3 className="text-sm font-semibold text-kurodo-muted uppercase tracking-wider mb-3">
+          {t.keyVocabulary}
+        </h3>
+        <div className="space-y-2">
+          {listening.vocabulary.map((v, i) => (
+            <div
+              key={i}
+              className="flex items-baseline justify-between px-4 py-3 rounded-lg bg-kurodo-deep/50 border border-white/5"
+            >
+              <div>
+                <span className="text-white font-medium">{v.word}</span>
+                <span className="text-kurodo-muted ml-2 text-sm">
+                  {v.reading}
+                </span>
+              </div>
+              <span className="text-white/70 text-sm ml-2 text-right">
+                {v.meaning}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Comprehension questions */}
+      <div>
+        <h3 className="text-sm font-semibold text-kurodo-muted uppercase tracking-wider mb-3">
+          {t.comprehension}
+        </h3>
+        <div className="space-y-3">
+          {listening.questions.map((q, i) => (
+            <MCQQuestion
+              key={i}
+              question={q.question}
+              choices={q.choices}
+              correctIndex={q.correctIndex}
+              lang={lang}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

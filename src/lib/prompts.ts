@@ -76,6 +76,20 @@ Generate a complete study session as a single JSON object with this exact struct
     "questions": [
       { "question": "<comprehension question in ${languageName}>", "choices": ["<a>","<b>","<c>","<d>"], "correctIndex": <0-3> }
     ]
+  },
+  "listening": {
+    "title": "<a short title for the dialogue in Japanese>",
+    "situation": "<a one-sentence description of the situation in ${languageName}, e.g. 'Two friends planning a weekend trip'>",
+    "dialogue": [
+      { "speaker": "<speaker name in Japanese, e.g. 田中>", "japanese": "<one line of dialogue in Japanese>", "reading": "<the same line rewritten entirely in hiragana>" }
+    ],
+    "translation": "<full translation of the entire dialogue in ${languageName}>",
+    "vocabulary": [
+      { "word": "<key word from the dialogue>", "reading": "<reading in hiragana>", "meaning": "<meaning in ${languageName}>" }
+    ],
+    "questions": [
+      { "question": "<comprehension question in ${languageName}>", "choices": ["<a>","<b>","<c>","<d>"], "correctIndex": <0-3> }
+    ]
   }
 }
 
@@ -97,6 +111,11 @@ Rules:
 - The reading section must have exactly 6 vocabulary items from the passage
 - The reading section must have exactly 3 comprehension questions in ${languageName} with answers in ${languageName}
 - Comprehension questions should test understanding of the content, not just word lookup
+- The listening dialogue must be a natural conversation between exactly 2 speakers with 6-10 lines total
+- The dialogue must use the same JLPT ${levelUpper} level constraints as the reading passage
+- The dialogue topic must be DIFFERENT from the reading passage topic
+- The listening section must have exactly 5 vocabulary items from the dialogue
+- The listening section must have exactly 3 comprehension questions in ${languageName} with answers in ${languageName}
 - Respond with ONLY the JSON object. No markdown, no code fences, no additional text.${buildHistorySection(history)}`;
 }
 

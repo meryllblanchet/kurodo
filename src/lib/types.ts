@@ -51,6 +51,7 @@ export interface GeneratedContent {
   grammar: GrammarOfTheDay;
   exercises: Exercises;
   reading: ReadingPassage;
+  listening: ListeningPassage;
 }
 
 export interface ReadingVocab {
@@ -63,6 +64,21 @@ export interface ReadingPassage {
   title: string;
   passage: string;
   passageReading: string;
+  translation: string;
+  vocabulary: ReadingVocab[];
+  questions: MCQQuestion[];
+}
+
+export interface DialogueLine {
+  speaker: string;
+  japanese: string;
+  reading: string;
+}
+
+export interface ListeningPassage {
+  title: string;
+  situation: string;
+  dialogue: DialogueLine[];
   translation: string;
   vocabulary: ReadingVocab[];
   questions: MCQQuestion[];

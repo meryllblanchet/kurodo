@@ -106,7 +106,14 @@ Rules:
 - For fill-in-the-blank, the blank should test particles, verb forms, or grammatical constructs
 - The reading passage must be 4-8 sentences, cohesive and interesting
 - CRITICAL: The reading passage MUST match JLPT ${levelUpper} level precisely:
-  ${level === "n5" ? "* N5: Use only basic kanji (about 100 kanji), simple verb forms (ます/です), short sentences, everyday topics (self-introduction, shopping, daily routine). Avoid compound sentences." : ""}${level === "n4" ? "* N4: Use basic kanji (about 300 kanji), て-form, たい-form, simple conditionals, everyday topics with slightly more detail (hobbies, travel plans, school life)." : ""}${level === "n3" ? "* N3: Use intermediate kanji (about 650 kanji), passive/causative forms, relative clauses, varied conjunctions, topics like news, opinions, social situations." : ""}${level === "n2" ? "* N2: Use advanced kanji (about 1000 kanji), complex grammar (ものの, にもかかわらず, etc.), abstract topics, newspaper-style writing, longer compound sentences." : ""}${level === "n1" ? "* N1: Use advanced kanji (about 2000 kanji), literary and formal expressions, complex nested clauses, academic or professional topics, nuanced vocabulary." : ""}
+  ${level === "n5" ? `* N5: This is ABSOLUTE BEGINNER level. Be extremely strict:
+    - Use ONLY these kanji: 一二三四五六七八九十百千万円時日月火水木金土曜年大小中長新古高安好白黒赤青学校先生人男女子友名前何上下右左外北南東西国語話読書聞食飲買来行出入休見
+    - Vocabulary must come from the JLPT N5 word list ONLY (about 800 words). Examples of allowed words: 私、学生、先生、学校、友達、水、お茶、食べます、飲みます、行きます、来ます、見ます、聞きます、買います
+    - Do NOT use words like 牛乳、食堂、会社、磨く、始まる — these are N4 or above
+    - Use ONLY ます/です forms, は/が/を/に/で/へ/と/も particles
+    - Maximum 4-5 short sentences, each under 15 words
+    - Topics: simple self-introduction, what I like, my family, my day (very basic)
+    - When in doubt, prefer hiragana over kanji` : ""}${level === "n4" ? "* N4: Use basic kanji (about 300 kanji), て-form, たい-form, simple conditionals (たら), everyday topics with slightly more detail (hobbies, travel plans, school life). Avoid passive/causative forms." : ""}${level === "n3" ? "* N3: Use intermediate kanji (about 650 kanji), passive/causative forms, relative clauses, varied conjunctions, topics like news, opinions, social situations." : ""}${level === "n2" ? "* N2: Use advanced kanji (about 1000 kanji), complex grammar (ものの, にもかかわらず, etc.), abstract topics, newspaper-style writing, longer compound sentences." : ""}${level === "n1" ? "* N1: Use advanced kanji (about 2000 kanji), literary and formal expressions, complex nested clauses, academic or professional topics, nuanced vocabulary." : ""}
 - Only use kanji and grammar structures that a JLPT ${levelUpper} student would have learned — do not exceed the level
 - The reading section must have exactly 6 vocabulary items from the passage
 - The reading section must have exactly 3 comprehension questions in ${languageName} with answers in ${languageName}

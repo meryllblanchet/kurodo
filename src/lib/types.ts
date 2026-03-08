@@ -52,6 +52,35 @@ export interface GeneratedContent {
   exercises: Exercises;
 }
 
+// SRS types
+
+export type SRSItemType = "kanji" | "grammar" | "vocabulary";
+
+export interface SRSItem {
+  id: string;
+  type: SRSItemType;
+  box: number;           // 1-5 (Leitner box)
+  lastReviewed: number;  // timestamp
+  nextReview: number;    // timestamp
+  totalReviews: number;
+  correctCount: number;
+  label: string;         // e.g. "食" or "てform"
+  sublabel?: string;     // e.g. meaning or reading
+}
+
+export interface SRSData {
+  version: number;
+  items: Record<string, SRSItem>;
+}
+
+export interface ExerciseResult {
+  itemId: string;
+  type: SRSItemType;
+  correct: boolean;
+  label: string;
+  sublabel?: string;
+}
+
 export interface CorrectionFeedback {
   overallScore: number;
   correctedText: string;

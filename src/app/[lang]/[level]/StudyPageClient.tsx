@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Language, JLPTLevel } from "@/lib/types";
+import { Language, JLPTLevel, ExerciseResult } from "@/lib/types";
 import { ui } from "@/lib/languages";
+import { groupWeakItems } from "@/lib/prompts";
 import { useGenerate } from "@/hooks/useGenerate";
 import { useProfile } from "@/hooks/useProfile";
+import { useSRS } from "@/hooks/useSRS";
 import { KanjiSection } from "@/components/KanjiSection";
 import { GrammarSection } from "@/components/GrammarSection";
 import { ExerciseSection } from "@/components/ExerciseSection";
 import { ProfileModal } from "@/components/ProfileModal";
 import { KanjiGrid } from "@/components/KanjiGrid";
+import { ProgressSection } from "@/components/ProgressSection";
 
 export function StudyPageClient({
   lang,
@@ -23,12 +26,19 @@ export function StudyPageClient({
   const { profile, saveProfile } = useProfile();
   const apiKey = profile?.apiKey || "";
   const t = ui[lang];
-  const { data, loading, error, generate } = useGenerate(lang, level, apiKey);
+  const srs = useSRS(level);
+
+  const getWeakItemsForPrompt = useCallback(() => {
+    const weak = srs.getWeakItems(10);
+    return weak.length > 0 ? groupWeakItems(weak) : undefined;
+  }, [srs]);
+
+  const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getWeakItemsForPrompt);
   const [activeSection, setActiveSection] = useState<
     "kanji" | "grammar" | "exercises" | null
   >(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [activeTab, setActiveTab] = useState<"session" | "dictionary">(
+  const [activeTab, setActiveTab] = useState<"session" | "dictionary" | "progress">(
     "session",
   );
 
@@ -43,6 +53,29 @@ export function StudyPageClient({
       router.push(`/${newLang}/${newLevel}`);
     }
   }
+
+  function handleExerciseResult(result: ExerciseResult) {
+    srs.recordResult(result);
+  }
+
+  // Record kanji of the day as reviewed when section is opened
+  function handleSectionToggle(key: "kanji" | "grammar" | "exercises") {
+    const newSection = activeSection === key ? null : key;
+    setActiveSection(newSection);
+
+    if (newSection === "kanji" && data) {
+      srs.recordResult({
+        itemId: `kanji:${data.kanji.kanji}`,
+        type: "kanji",
+        correct: true,
+        label: data.kanji.kanji,
+        sublabel: data.kanji.meaning,
+      });
+    }
+  }
+
+  const stats = srs.getStats();
+  const dueItems = srs.getDueItems();
 
   return (
     <div className="min-h-screen flex flex-col px-4 py-6 max-w-lg mx-auto">
@@ -87,26 +120,30 @@ export function StudyPageClient({
 
       {/* Tab Navigation */}
       <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setActiveTab("session")}
-          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-            activeTab === "session"
-              ? "bg-kurodo-red text-white"
-              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
-          }`}
-        >
-          {t.studySession}
-        </button>
-        <button
-          onClick={() => setActiveTab("dictionary")}
-          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-            activeTab === "dictionary"
-              ? "bg-kurodo-red text-white"
-              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
-          }`}
-        >
-          {t.kanjiDictionary}
-        </button>
+        {(
+          [
+            { key: "session" as const, label: t.studySession, badge: 0 },
+            { key: "dictionary" as const, label: t.kanjiDictionary, badge: 0 },
+            { key: "progress" as const, label: t.progress, badge: stats.dueNow },
+          ]
+        ).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 relative ${
+              activeTab === tab.key
+                ? "bg-kurodo-red text-white"
+                : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
+            }`}
+          >
+            {tab.label}
+            {tab.badge > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-kurodo-red text-white text-xs flex items-center justify-center font-bold">
+                {tab.badge > 99 ? "99" : tab.badge}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Study Session Tab */}
@@ -162,11 +199,7 @@ export function StudyPageClient({
               ).map((section) => (
                 <div key={section.key}>
                   <button
-                    onClick={() =>
-                      setActiveSection(
-                        activeSection === section.key ? null : section.key,
-                      )
-                    }
+                    onClick={() => handleSectionToggle(section.key)}
                     className="w-full flex items-center justify-between px-5 py-4 rounded-xl bg-kurodo-card border border-white/5 hover:border-kurodo-red/30 transition-all duration-200"
                   >
                     <div className="flex items-center gap-3">
@@ -198,6 +231,7 @@ export function StudyPageClient({
                           lang={lang}
                           level={level}
                           apiKey={apiKey}
+                          onExerciseResult={handleExerciseResult}
                         />
                       )}
                     </div>
@@ -212,6 +246,11 @@ export function StudyPageClient({
       {/* Kanji Dictionary Tab */}
       {activeTab === "dictionary" && (
         <KanjiGrid lang={lang} level={level} apiKey={apiKey} />
+      )}
+
+      {/* Progress Tab */}
+      {activeTab === "progress" && (
+        <ProgressSection lang={lang} stats={stats} dueItems={dueItems} />
       )}
 
       {/* Profile Modal */}

@@ -8,6 +8,8 @@ import {
   MCQQuestion as MCQQuestionType,
   TranslationParagraph,
   CorrectionFeedback,
+  ExerciseResult,
+  SRSItemType,
 } from "@/lib/types";
 import { ui } from "@/lib/languages";
 import { correctTranslation } from "@/lib/claude-client";
@@ -17,14 +19,22 @@ function MCQQuestion({
   choices,
   correctIndex,
   lang,
+  onAnswer,
 }: {
   question: string;
   choices: [string, string, string, string];
   correctIndex: number;
   lang: Language;
+  onAnswer?: (correct: boolean) => void;
 }) {
   const t = ui[lang];
   const [selected, setSelected] = useState<number | null>(null);
+
+  function handleSelect(i: number) {
+    if (selected !== null) return;
+    setSelected(i);
+    onAnswer?.(i === correctIndex);
+  }
 
   return (
     <div className="px-4 py-4 rounded-lg bg-kurodo-deep/50 border border-white/5">
@@ -47,7 +57,7 @@ function MCQQuestion({
           return (
             <button
               key={i}
-              onClick={() => selected === null && setSelected(i)}
+              onClick={() => handleSelect(i)}
               className={style}
             >
               {choice}
@@ -71,11 +81,13 @@ function TranslationExercise({
   lang,
   level,
   apiKey,
+  onResult,
 }: {
   exercise: TranslationParagraph;
   lang: Language;
   level: JLPTLevel;
   apiKey: string;
+  onResult?: (score: number) => void;
 }) {
   const t = ui[lang];
   const [userText, setUserText] = useState("");
@@ -91,6 +103,7 @@ function TranslationExercise({
     try {
       const result = await correctTranslation(apiKey, lang, level, exercise.prompt, userText);
       setFeedback(result);
+      onResult?.(result.overallScore);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -196,12 +209,15 @@ function MCQExerciseList({
   questions,
   lang,
   label,
+  exerciseType,
+  onExerciseResult,
 }: {
   questions: MCQQuestionType[];
   lang: Language;
   label: string;
+  exerciseType: SRSItemType;
+  onExerciseResult?: (result: ExerciseResult) => void;
 }) {
-  const t = ui[lang];
   return (
     <div className="space-y-3">
       {questions.map((q, i) => (
@@ -214,6 +230,14 @@ function MCQExerciseList({
             choices={q.choices}
             correctIndex={q.correctIndex}
             lang={lang}
+            onAnswer={(correct) =>
+              onExerciseResult?.({
+                itemId: `${exerciseType}:${q.question}`,
+                type: exerciseType,
+                correct,
+                label: q.question,
+              })
+            }
           />
         </div>
       ))}
@@ -228,16 +252,25 @@ const tabKeys = [
   "kanjiMeaning",
 ] as const;
 
+const tabSRSTypes: Record<(typeof tabKeys)[number], SRSItemType> = {
+  fillInTheBlank: "grammar",
+  jpToLang: "vocabulary",
+  langToJp: "grammar",
+  kanjiMeaning: "kanji",
+};
+
 export function ExerciseSection({
   exercises,
   lang,
   level,
   apiKey,
+  onExerciseResult,
 }: {
   exercises: Exercises;
   lang: Language;
   level: JLPTLevel;
   apiKey: string;
+  onExerciseResult?: (result: ExerciseResult) => void;
 }) {
   const t = ui[lang];
   const [activeTab, setActiveTab] = useState(0);
@@ -275,6 +308,14 @@ export function ExerciseSection({
             lang={lang}
             level={level}
             apiKey={apiKey}
+            onResult={(score) =>
+              onExerciseResult?.({
+                itemId: `grammar:${exercises.langToJp.prompt.slice(0, 60)}`,
+                type: "grammar",
+                correct: score >= 7,
+                label: exercises.langToJp.prompt.slice(0, 40),
+              })
+            }
           />
         ) : (
           <MCQExerciseList
@@ -282,6 +323,8 @@ export function ExerciseSection({
             questions={exercises[currentKey]}
             lang={lang}
             label={t.exercise}
+            exerciseType={tabSRSTypes[currentKey]}
+            onExerciseResult={onExerciseResult}
           />
         )}
       </div>

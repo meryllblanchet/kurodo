@@ -1,41 +1,7 @@
-import { Language, JLPTLevel, SRSItem } from "./types";
+import { Language, JLPTLevel } from "./types";
 import { languageNames } from "./languages";
 
-export interface WeakItems {
-  kanji: string[];
-  grammar: string[];
-  vocabulary: string[];
-}
-
-export function groupWeakItems(items: SRSItem[]): WeakItems {
-  const result: WeakItems = { kanji: [], grammar: [], vocabulary: [] };
-  for (const item of items) {
-    result[item.type].push(item.label);
-  }
-  return result;
-}
-
-function buildWeakItemsSection(weakItems?: WeakItems): string {
-  if (!weakItems) return "";
-  const parts: string[] = [];
-  if (weakItems.kanji.length > 0) {
-    parts.push(`- Kanji to focus on: ${weakItems.kanji.join(", ")} (use these in vocabulary examples and kanjiMeaning exercises)`);
-  }
-  if (weakItems.grammar.length > 0) {
-    parts.push(`- Grammar to review: ${weakItems.grammar.slice(0, 5).join(", ")} (create fillInTheBlank exercises using these)`);
-  }
-  if (weakItems.vocabulary.length > 0) {
-    parts.push(`- Vocabulary to reinforce: ${weakItems.vocabulary.slice(0, 5).join(", ")} (include in jpToLang exercises)`);
-  }
-  if (parts.length === 0) return "";
-  return `
-
-PRIORITY REVIEW ITEMS:
-The student is struggling with the following items. Incorporate at least 2-3 of them naturally into the exercises:
-${parts.join("\n")}`;
-}
-
-export function buildPrompt(lang: Language, level: JLPTLevel, weakItems?: WeakItems): string {
+export function buildPrompt(lang: Language, level: JLPTLevel): string {
   const languageName = languageNames[lang];
   const levelUpper = level.toUpperCase();
 
@@ -90,7 +56,7 @@ Rules:
 - Make the wrong MCQ choices plausible but clearly incorrect
 - Pick a random kanji and grammar point — vary your choices
 - For fill-in-the-blank, the blank should test particles, verb forms, or grammatical constructs
-- Respond with ONLY the JSON object. No markdown, no code fences, no additional text.${buildWeakItemsSection(weakItems)}`;
+- Respond with ONLY the JSON object. No markdown, no code fences, no additional text.`;
 }
 
 export function buildCorrectionPrompt(

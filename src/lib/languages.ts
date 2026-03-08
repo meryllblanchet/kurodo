@@ -76,14 +76,6 @@ export const ui: Record<
     apiKey: string;
     apiKeyPlaceholder: string;
     apiKeyRequired: string;
-    progress: string;
-    dueForReview: string;
-    totalTracked: string;
-    accuracy: string;
-    box: string;
-    noDueItems: string;
-    reviewNow: string;
-    lastReviewed: string;
   }
 > = {
   en: {
@@ -137,14 +129,6 @@ export const ui: Record<
     apiKey: "Anthropic API Key",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Please set your Anthropic API key in the profile settings.",
-    progress: "Progress",
-    dueForReview: "Due for review",
-    totalTracked: "Items tracked",
-    accuracy: "Accuracy",
-    box: "Box",
-    noDueItems: "No items due for review. Keep studying!",
-    reviewNow: "Review Now",
-    lastReviewed: "Last reviewed",
   },
   fr: {
     appTitle: "Kurodo",
@@ -197,14 +181,6 @@ export const ui: Record<
     apiKey: "Clé API Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Veuillez configurer votre clé API Anthropic dans les paramètres du profil.",
-    progress: "Progrès",
-    dueForReview: "À réviser",
-    totalTracked: "Éléments suivis",
-    accuracy: "Précision",
-    box: "Boîte",
-    noDueItems: "Aucun élément à réviser. Continuez à étudier !",
-    reviewNow: "Réviser maintenant",
-    lastReviewed: "Dernière révision",
   },
   de: {
     appTitle: "Kurodo",
@@ -257,14 +233,6 @@ export const ui: Record<
     apiKey: "Anthropic API-Schlüssel",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Bitte setzen Sie Ihren Anthropic API-Schlüssel in den Profileinstellungen.",
-    progress: "Fortschritt",
-    dueForReview: "Zur Wiederholung fällig",
-    totalTracked: "Verfolgte Elemente",
-    accuracy: "Genauigkeit",
-    box: "Box",
-    noDueItems: "Keine Elemente zur Wiederholung fällig. Weiter lernen!",
-    reviewNow: "Jetzt wiederholen",
-    lastReviewed: "Zuletzt wiederholt",
   },
   it: {
     appTitle: "Kurodo",
@@ -317,14 +285,6 @@ export const ui: Record<
     apiKey: "Chiave API Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Configura la tua chiave API Anthropic nelle impostazioni del profilo.",
-    progress: "Progressi",
-    dueForReview: "Da rivedere",
-    totalTracked: "Elementi tracciati",
-    accuracy: "Precisione",
-    box: "Scatola",
-    noDueItems: "Nessun elemento da rivedere. Continua a studiare!",
-    reviewNow: "Rivedi ora",
-    lastReviewed: "Ultima revisione",
   },
   es: {
     appTitle: "Kurodo",
@@ -377,14 +337,6 @@ export const ui: Record<
     apiKey: "Clave API de Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Por favor, configura tu clave API de Anthropic en los ajustes del perfil.",
-    progress: "Progreso",
-    dueForReview: "Pendiente de revisión",
-    totalTracked: "Elementos seguidos",
-    accuracy: "Precisión",
-    box: "Caja",
-    noDueItems: "No hay elementos pendientes de revisión. ¡Sigue estudiando!",
-    reviewNow: "Revisar ahora",
-    lastReviewed: "Última revisión",
   },
   pt: {
     appTitle: "Kurodo",
@@ -437,14 +389,6 @@ export const ui: Record<
     apiKey: "Chave API Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Por favor, configure sua chave API Anthropic nas configurações do perfil.",
-    progress: "Progresso",
-    dueForReview: "Pendente de revisão",
-    totalTracked: "Itens rastreados",
-    accuracy: "Precisão",
-    box: "Caixa",
-    noDueItems: "Nenhum item pendente de revisão. Continue estudando!",
-    reviewNow: "Revisar agora",
-    lastReviewed: "Última revisão",
   },
 };
 

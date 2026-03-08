@@ -24,7 +24,7 @@ export function StudyPageClient({
   const { profile, saveProfile } = useProfile();
   const apiKey = profile?.apiKey || "";
   const t = ui[lang];
-  const { history, record: recordHistory } = useHistory(level);
+  const { history, record: recordHistory, reset: resetHistory, progress, levelComplete } = useHistory(level);
   const getHistory = useCallback(() => history, [history]);
   const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory);
   const [activeSection, setActiveSection] = useState<
@@ -45,6 +45,22 @@ export function StudyPageClient({
       recordHistory(data.kanji.kanji, data.grammar.title);
     }
   }, [data]);
+
+  const nextLevelMap: Record<JLPTLevel, JLPTLevel | null> = {
+    n5: "n4", n4: "n3", n3: "n2", n2: "n1", n1: null,
+  };
+  const nextLevel = nextLevelMap[level];
+
+  function handleStartOver() {
+    resetHistory();
+  }
+
+  function handleNextLevel() {
+    if (nextLevel) {
+      saveProfile({ lang, level: nextLevel, apiKey });
+      router.push(`/${lang}/${nextLevel}`);
+    }
+  }
 
   function handleProfileSave(newLang: Language, newLevel: JLPTLevel, newApiKey: string) {
     saveProfile({ lang: newLang, level: newLevel, apiKey: newApiKey });
@@ -122,6 +138,62 @@ export function StudyPageClient({
       {/* Study Session Tab */}
       {activeTab === "session" && (
         <div>
+          {/* Progress bars */}
+          {(progress.kanjiCovered > 0 || progress.grammarCovered > 0) && (
+            <div className="mb-6 space-y-2">
+              <div>
+                <div className="flex justify-between text-xs text-kurodo-muted mb-1">
+                  <span>{t.kanjiProgress}</span>
+                  <span>{progress.kanjiCovered}/{progress.totalKanji}</span>
+                </div>
+                <div className="h-2 rounded-full bg-kurodo-deep/50 border border-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-kurodo-red transition-all duration-500"
+                    style={{ width: `${progress.totalKanji > 0 ? Math.min((progress.kanjiCovered / progress.totalKanji) * 100, 100) : 0}%` }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-xs text-kurodo-muted mb-1">
+                  <span>{t.grammarProgress}</span>
+                  <span>{progress.grammarCovered}/{progress.totalGrammar}</span>
+                </div>
+                <div className="h-2 rounded-full bg-kurodo-deep/50 border border-white/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-kurodo-gold transition-all duration-500"
+                    style={{ width: `${Math.min((progress.grammarCovered / progress.totalGrammar) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Level complete banner */}
+          {levelComplete && (
+            <div className="mb-6 px-5 py-4 rounded-xl bg-green-500/10 border border-green-500/20 animate-fade-in">
+              <p className="text-green-400 font-medium text-sm mb-3">
+                {t.levelComplete}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleStartOver}
+                  className="flex-1 py-2 rounded-lg text-sm font-medium bg-kurodo-card border border-white/10 text-white/80 hover:border-kurodo-red/40 transition-all duration-200"
+                >
+                  {t.startOver}
+                </button>
+                {nextLevel && (
+                  <button
+                    onClick={handleNextLevel}
+                    className="flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-200"
+                    style={{ background: "linear-gradient(135deg, #C41E3A, #8B0000)" }}
+                  >
+                    {t.nextLevel} ({nextLevel.toUpperCase()})
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Generate Button */}
           <button
             onClick={generate}

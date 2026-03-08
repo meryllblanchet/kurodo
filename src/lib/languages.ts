@@ -76,6 +76,11 @@ export const ui: Record<
     apiKey: string;
     apiKeyPlaceholder: string;
     apiKeyRequired: string;
+    levelComplete: string;
+    startOver: string;
+    nextLevel: string;
+    kanjiProgress: string;
+    grammarProgress: string;
   }
 > = {
   en: {
@@ -129,6 +134,11 @@ export const ui: Record<
     apiKey: "Anthropic API Key",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Please set your Anthropic API key in the profile settings.",
+    levelComplete: "You've covered all kanji and grammar for this level!",
+    startOver: "Start Over",
+    nextLevel: "Next Level",
+    kanjiProgress: "Kanji",
+    grammarProgress: "Grammar",
   },
   fr: {
     appTitle: "Kurodo",
@@ -181,6 +191,11 @@ export const ui: Record<
     apiKey: "Clé API Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Veuillez configurer votre clé API Anthropic dans les paramètres du profil.",
+    levelComplete: "Vous avez couvert tous les kanji et la grammaire de ce niveau !",
+    startOver: "Recommencer",
+    nextLevel: "Niveau suivant",
+    kanjiProgress: "Kanji",
+    grammarProgress: "Grammaire",
   },
   de: {
     appTitle: "Kurodo",
@@ -233,6 +248,11 @@ export const ui: Record<
     apiKey: "Anthropic API-Schlüssel",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Bitte setzen Sie Ihren Anthropic API-Schlüssel in den Profileinstellungen.",
+    levelComplete: "Sie haben alle Kanji und Grammatik für dieses Level abgedeckt!",
+    startOver: "Neu starten",
+    nextLevel: "Nächstes Level",
+    kanjiProgress: "Kanji",
+    grammarProgress: "Grammatik",
   },
   it: {
     appTitle: "Kurodo",
@@ -285,6 +305,11 @@ export const ui: Record<
     apiKey: "Chiave API Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Configura la tua chiave API Anthropic nelle impostazioni del profilo.",
+    levelComplete: "Hai coperto tutti i kanji e la grammatica di questo livello!",
+    startOver: "Ricomincia",
+    nextLevel: "Livello successivo",
+    kanjiProgress: "Kanji",
+    grammarProgress: "Grammatica",
   },
   es: {
     appTitle: "Kurodo",
@@ -337,6 +362,11 @@ export const ui: Record<
     apiKey: "Clave API de Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Por favor, configura tu clave API de Anthropic en los ajustes del perfil.",
+    levelComplete: "¡Has cubierto todos los kanji y la gramática de este nivel!",
+    startOver: "Empezar de nuevo",
+    nextLevel: "Siguiente nivel",
+    kanjiProgress: "Kanji",
+    grammarProgress: "Gramática",
   },
   pt: {
     appTitle: "Kurodo",
@@ -389,6 +419,11 @@ export const ui: Record<
     apiKey: "Chave API Anthropic",
     apiKeyPlaceholder: "sk-ant-...",
     apiKeyRequired: "Por favor, configure sua chave API Anthropic nas configurações do perfil.",
+    levelComplete: "Você cobriu todos os kanji e gramática deste nível!",
+    startOver: "Recomeçar",
+    nextLevel: "Próximo nível",
+    kanjiProgress: "Kanji",
+    grammarProgress: "Gramática",
   },
 };
 

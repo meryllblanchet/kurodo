@@ -115,6 +115,8 @@ export const ui: Record<
     deleteSession: string;
     today: string;
     yesterday: string;
+    clearAllHistory: string;
+    clearAllConfirm: string;
   }
 > = {
   en: {
@@ -207,6 +209,8 @@ export const ui: Record<
     deleteSession: "Delete",
     today: "Today",
     yesterday: "Yesterday",
+    clearAllHistory: "Clear all & reset progress",
+    clearAllConfirm: "This will delete all past sessions and reset your kanji/grammar progress for this level. Are you sure?",
   },
   fr: {
     appTitle: "Kurodo",
@@ -298,6 +302,8 @@ export const ui: Record<
     deleteSession: "Supprimer",
     today: "Aujourd'hui",
     yesterday: "Hier",
+    clearAllHistory: "Tout supprimer et réinitialiser",
+    clearAllConfirm: "Cela supprimera toutes les sessions passées et réinitialisera votre progression kanji/grammaire pour ce niveau. Êtes-vous sûr ?",
   },
   de: {
     appTitle: "Kurodo",
@@ -389,6 +395,8 @@ export const ui: Record<
     deleteSession: "Löschen",
     today: "Heute",
     yesterday: "Gestern",
+    clearAllHistory: "Alles löschen und zurücksetzen",
+    clearAllConfirm: "Dadurch werden alle vergangenen Sitzungen gelöscht und Ihr Kanji-/Grammatik-Fortschritt für dieses Level zurückgesetzt. Sind Sie sicher?",
   },
   it: {
     appTitle: "Kurodo",
@@ -480,6 +488,8 @@ export const ui: Record<
     deleteSession: "Elimina",
     today: "Oggi",
     yesterday: "Ieri",
+    clearAllHistory: "Cancella tutto e reimposta",
+    clearAllConfirm: "Questo eliminerà tutte le sessioni passate e resetterà i progressi kanji/grammatica per questo livello. Sei sicuro?",
   },
   es: {
     appTitle: "Kurodo",
@@ -571,6 +581,8 @@ export const ui: Record<
     deleteSession: "Eliminar",
     today: "Hoy",
     yesterday: "Ayer",
+    clearAllHistory: "Borrar todo y reiniciar",
+    clearAllConfirm: "Esto eliminará todas las sesiones anteriores y reiniciará tu progreso de kanji/gramática para este nivel. ¿Estás seguro?",
   },
   pt: {
     appTitle: "Kurodo",
@@ -662,6 +674,8 @@ export const ui: Record<
     deleteSession: "Excluir",
     today: "Hoje",
     yesterday: "Ontem",
+    clearAllHistory: "Excluir tudo e reiniciar",
+    clearAllConfirm: "Isso excluirá todas as sessões anteriores e reiniciará seu progresso de kanji/gramática para este nível. Tem certeza?",
   },
 };
 

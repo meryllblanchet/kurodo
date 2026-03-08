@@ -43,7 +43,7 @@ export function StudyPageClient({
   const sections = profile?.sections || [...ALL_SECTIONS];
   const t = ui[lang];
   const { history, record: recordHistory, reset: resetHistory, progress, levelComplete } = useHistory(level);
-  const { sessions, save: saveSession, remove: removeSession } = useSessionHistory(level);
+  const { sessions, save: saveSession, remove: removeSession, clearAll: clearAllSessions } = useSessionHistory(level);
   const getHistory = useCallback(() => history, [history]);
   const getSections = useCallback(() => sections, [sections]);
   const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory, getSections);
@@ -311,6 +311,19 @@ export function StudyPageClient({
                   </button>
                 </div>
               ))}
+
+              {/* Clear all & reset */}
+              <button
+                onClick={() => {
+                  if (window.confirm(t.clearAllConfirm)) {
+                    clearAllSessions();
+                    resetHistory();
+                  }
+                }}
+                className="w-full mt-4 py-3 rounded-xl text-sm font-medium text-red-400/70 hover:text-red-400 bg-red-500/5 border border-red-500/10 hover:border-red-500/20 transition-all duration-200"
+              >
+                {t.clearAllHistory}
+              </button>
             </div>
           )}
         </div>

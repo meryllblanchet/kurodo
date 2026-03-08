@@ -55,5 +55,10 @@ export function useSessionHistory(level: JLPTLevel) {
     [level, sessions],
   );
 
-  return { sessions, save, remove };
+  const clearAll = useCallback(() => {
+    setSessions([]);
+    localStorage.removeItem(storageKey(level));
+  }, [level]);
+
+  return { sessions, save, remove, clearAll };
 }

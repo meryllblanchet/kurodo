@@ -104,6 +104,12 @@ export const ui: Record<
     welcome: string;
     welcomeSubtitle: string;
     getStarted: string;
+    speaking: string;
+    tapToSpeak: string;
+    listening_status: string;
+    tryAgainSpeaking: string;
+    listenFirst: string;
+    speechNotSupported: string;
     history: string;
     noHistory: string;
     deleteSession: string;
@@ -190,6 +196,12 @@ export const ui: Record<
     welcome: "Welcome to Kurodo",
     welcomeSubtitle: "Set up your API key and preferences to get started.",
     getStarted: "Get Started",
+    speaking: "Speaking",
+    tapToSpeak: "Tap to speak",
+    listening_status: "Listening...",
+    tryAgainSpeaking: "Try again",
+    listenFirst: "Listen",
+    speechNotSupported: "Speech recognition is not supported in this browser.",
     history: "History",
     noHistory: "No past sessions yet. Generate your first lesson!",
     deleteSession: "Delete",
@@ -275,6 +287,12 @@ export const ui: Record<
     welcome: "Bienvenue sur Kurodo",
     welcomeSubtitle: "Configurez votre clé API et vos préférences pour commencer.",
     getStarted: "Commencer",
+    speaking: "Expression orale",
+    tapToSpeak: "Appuyez pour parler",
+    listening_status: "Écoute en cours...",
+    tryAgainSpeaking: "Réessayer",
+    listenFirst: "Écouter",
+    speechNotSupported: "La reconnaissance vocale n'est pas prise en charge par ce navigateur.",
     history: "Historique",
     noHistory: "Aucune session passée. Générez votre première leçon !",
     deleteSession: "Supprimer",
@@ -360,6 +378,12 @@ export const ui: Record<
     welcome: "Willkommen bei Kurodo",
     welcomeSubtitle: "Richten Sie Ihren API-Schlüssel und Ihre Einstellungen ein.",
     getStarted: "Loslegen",
+    speaking: "Sprechen",
+    tapToSpeak: "Tippen zum Sprechen",
+    listening_status: "Hört zu...",
+    tryAgainSpeaking: "Nochmal",
+    listenFirst: "Anhören",
+    speechNotSupported: "Spracherkennung wird von diesem Browser nicht unterstützt.",
     history: "Verlauf",
     noHistory: "Noch keine vergangenen Sitzungen. Erstellen Sie Ihre erste Lektion!",
     deleteSession: "Löschen",
@@ -445,6 +469,12 @@ export const ui: Record<
     welcome: "Benvenuto su Kurodo",
     welcomeSubtitle: "Configura la tua chiave API e le preferenze per iniziare.",
     getStarted: "Inizia",
+    speaking: "Parlato",
+    tapToSpeak: "Tocca per parlare",
+    listening_status: "Ascolto in corso...",
+    tryAgainSpeaking: "Riprova",
+    listenFirst: "Ascolta",
+    speechNotSupported: "Il riconoscimento vocale non è supportato da questo browser.",
     history: "Cronologia",
     noHistory: "Nessuna sessione passata. Genera la tua prima lezione!",
     deleteSession: "Elimina",
@@ -530,6 +560,12 @@ export const ui: Record<
     welcome: "Bienvenido a Kurodo",
     welcomeSubtitle: "Configura tu clave API y tus preferencias para empezar.",
     getStarted: "Empezar",
+    speaking: "Expresión oral",
+    tapToSpeak: "Toca para hablar",
+    listening_status: "Escuchando...",
+    tryAgainSpeaking: "Intentar de nuevo",
+    listenFirst: "Escuchar",
+    speechNotSupported: "El reconocimiento de voz no es compatible con este navegador.",
     history: "Historial",
     noHistory: "No hay sesiones anteriores. ¡Genera tu primera lección!",
     deleteSession: "Eliminar",
@@ -615,6 +651,12 @@ export const ui: Record<
     welcome: "Bem-vindo ao Kurodo",
     welcomeSubtitle: "Configure sua chave API e preferências para começar.",
     getStarted: "Começar",
+    speaking: "Expressão oral",
+    tapToSpeak: "Toque para falar",
+    listening_status: "Ouvindo...",
+    tryAgainSpeaking: "Tentar novamente",
+    listenFirst: "Ouvir",
+    speechNotSupported: "O reconhecimento de voz não é suportado neste navegador.",
     history: "Histórico",
     noHistory: "Nenhuma sessão anterior. Gere sua primeira lição!",
     deleteSession: "Excluir",

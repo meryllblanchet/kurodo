@@ -4,12 +4,13 @@ import { useState } from "react";
 import { Language, JLPTLevel, SectionKey, ALL_SECTIONS } from "@/lib/types";
 import { ui, languages, jlptLevels } from "@/lib/languages";
 
-const SECTION_META: { key: SectionKey; icon: string; labelKey: "kanjiOfTheDay" | "grammarOfTheDay" | "writing" | "reading" | "listening" }[] = [
+const SECTION_META: { key: SectionKey; icon: string; labelKey: "kanjiOfTheDay" | "grammarOfTheDay" | "writing" | "reading" | "listening" | "speaking" }[] = [
   { key: "kanji", icon: "漢", labelKey: "kanjiOfTheDay" },
   { key: "grammar", icon: "文", labelKey: "grammarOfTheDay" },
   { key: "exercises", icon: "書", labelKey: "writing" },
   { key: "reading", icon: "読", labelKey: "reading" },
   { key: "listening", icon: "聴", labelKey: "listening" },
+  { key: "speaking", icon: "話", labelKey: "speaking" },
 ];
 
 export function ProfileModal({

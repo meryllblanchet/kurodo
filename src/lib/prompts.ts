@@ -140,6 +140,21 @@ export function buildPrompt(lang: Language, level: JLPTLevel, history?: StudyHis
     }
   }
 
+  if (has("speaking")) {
+    schemaParts.push(`  "speaking": {
+    "prompts": [
+      { "japanese": "<a natural Japanese sentence to read aloud>", "reading": "<the sentence in hiragana>", "meaning": "<translation in ${languageName}>" }
+    ]
+  }`);
+    rulesParts.push("- The speaking section must have exactly 5 prompts — natural sentences suitable for pronunciation practice");
+    rulesParts.push(`- Speaking prompts must use ONLY vocabulary and grammar appropriate for JLPT ${levelUpper}`);
+    rulesParts.push("- Speaking prompts should vary in length: 2 short (5-8 words), 2 medium (8-12 words), 1 longer (12-16 words)");
+    rulesParts.push("- Speaking prompts should cover different situations (greetings, questions, descriptions, requests, etc.)");
+    if (!has("reading") && !has("listening")) {
+      rulesParts.push(`- CRITICAL: Speaking prompts MUST match JLPT ${levelUpper} level precisely:\n  ${levelConstraint}`);
+    }
+  }
+
   // Add general rules
   rulesParts.push(`- All content must be appropriate for JLPT ${levelUpper} difficulty level`);
   rulesParts.push("- For MCQ questions, vary the correctIndex across 0, 1, 2, and 3 — do not always place the correct answer at the same position");

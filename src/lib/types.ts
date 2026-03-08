@@ -1,8 +1,8 @@
 export type Language = "en" | "fr" | "de" | "it" | "es" | "pt";
 export type JLPTLevel = "n5" | "n4" | "n3" | "n2" | "n1";
-export type SectionKey = "kanji" | "grammar" | "exercises" | "reading" | "listening";
+export type SectionKey = "kanji" | "grammar" | "exercises" | "reading" | "listening" | "speaking";
 
-export const ALL_SECTIONS: SectionKey[] = ["kanji", "grammar", "exercises", "reading", "listening"];
+export const ALL_SECTIONS: SectionKey[] = ["kanji", "grammar", "exercises", "reading", "listening", "speaking"];
 
 export interface KanjiVocab {
   word: string;
@@ -55,6 +55,7 @@ export interface GeneratedContent {
   exercises?: Exercises;
   reading?: ReadingPassage;
   listening?: ListeningPassage;
+  speaking?: SpeakingExercise;
 }
 
 export interface ReadingVocab {
@@ -85,6 +86,16 @@ export interface ListeningPassage {
   translation: string;
   vocabulary: ReadingVocab[];
   questions: MCQQuestion[];
+}
+
+export interface SpeakingPrompt {
+  japanese: string;
+  reading: string;
+  meaning: string;
+}
+
+export interface SpeakingExercise {
+  prompts: SpeakingPrompt[];
 }
 
 export interface CorrectionFeedback {

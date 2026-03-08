@@ -8,6 +8,7 @@ import { GrammarSection } from "@/components/GrammarSection";
 import { ExerciseSection } from "@/components/ExerciseSection";
 import { ReadingSection } from "@/components/ReadingSection";
 import { ListeningSection } from "@/components/ListeningSection";
+import { SpeakingSection } from "@/components/SpeakingSection";
 
 const ALL_SECTION_META = [
   { key: "kanji" as const, labelKey: "kanjiOfTheDay" as const, icon: "漢" },
@@ -15,6 +16,7 @@ const ALL_SECTION_META = [
   { key: "exercises" as const, labelKey: "writing" as const, icon: "書" },
   { key: "reading" as const, labelKey: "reading" as const, icon: "読" },
   { key: "listening" as const, labelKey: "listening" as const, icon: "聴" },
+  { key: "speaking" as const, labelKey: "speaking" as const, icon: "話" },
 ];
 
 export function SessionContent({
@@ -40,6 +42,7 @@ export function SessionContent({
       : s.key === "exercises" ? data.exercises
       : s.key === "reading" ? data.reading
       : s.key === "listening" ? data.listening
+      : s.key === "speaking" ? data.speaking
       : null;
     return !!d;
   });
@@ -88,6 +91,9 @@ export function SessionContent({
               )}
               {section.key === "listening" && data.listening && (
                 <ListeningSection listening={data.listening} lang={lang} />
+              )}
+              {section.key === "speaking" && data.speaking && (
+                <SpeakingSection speaking={data.speaking} lang={lang} />
               )}
             </div>
           )}

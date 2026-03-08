@@ -5,9 +5,9 @@ import { Language, ListeningPassage } from "@/lib/types";
 import { ui } from "@/lib/languages";
 
 const SPEED_OPTIONS = [
-  { key: "slow", rate: 0.4 },
-  { key: "normal", rate: 0.75 },
-  { key: "fast", rate: 1.5 },
+  { key: "slow", rate: 0.3, pause: 1500 },
+  { key: "normal", rate: 0.7, pause: 600 },
+  { key: "fast", rate: 1.5, pause: 0 },
 ] as const;
 
 type SpeedKey = (typeof SPEED_OPTIONS)[number]["key"];
@@ -96,17 +96,29 @@ export function ListeningSection({
     fast: t.fast,
   };
 
-  function getRate() {
-    return SPEED_OPTIONS.find((s) => s.key === speedRef.current)!.rate;
+  const cancelledRef = useRef(false);
+
+  function getSpeedConfig() {
+    return SPEED_OPTIONS.find((s) => s.key === speedRef.current)!;
   }
 
   function speakOne(text: string, onEnd?: () => void) {
+    const cfg = getSpeedConfig();
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = "ja-JP";
     const voice = getJapaneseVoice();
     if (voice) utt.voice = voice;
-    utt.rate = getRate();
-    if (onEnd) utt.onend = onEnd;
+    utt.rate = cfg.rate;
+    utt.onend = () => {
+      if (onEnd && !cancelledRef.current) {
+        const delay = cfg.pause;
+        if (delay > 0) {
+          setTimeout(onEnd, delay);
+        } else {
+          onEnd();
+        }
+      }
+    };
     utt.onerror = () => {
       setIsPlaying(false);
       setCurrentLine(-1);
@@ -115,6 +127,7 @@ export function ListeningSection({
   }
 
   function stop() {
+    cancelledRef.current = true;
     window.speechSynthesis.cancel();
     setIsPlaying(false);
     setCurrentLine(-1);
@@ -126,11 +139,12 @@ export function ListeningSection({
       return;
     }
 
+    cancelledRef.current = false;
     window.speechSynthesis.cancel();
     setIsPlaying(true);
 
     function speakLine(index: number) {
-      if (index >= listening.dialogue.length) {
+      if (index >= listening.dialogue.length || cancelledRef.current) {
         setIsPlaying(false);
         setCurrentLine(-1);
         return;
@@ -146,6 +160,7 @@ export function ListeningSection({
   }
 
   function replayLine(index: number) {
+    cancelledRef.current = false;
     window.speechSynthesis.cancel();
     setIsPlaying(true);
     setCurrentLine(index);

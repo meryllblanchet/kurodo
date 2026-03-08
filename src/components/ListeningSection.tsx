@@ -97,6 +97,8 @@ export function ListeningSection({
   };
 
   const cancelledRef = useRef(false);
+  const pausedRef = useRef(false);
+  const nextLineRef = useRef(0);
 
   function getSpeedConfig() {
     return SPEED_OPTIONS.find((s) => s.key === speedRef.current)!;
@@ -126,16 +128,31 @@ export function ListeningSection({
     window.speechSynthesis.speak(utt);
   }
 
-  function stop() {
+  function speakFrom(index: number) {
+    if (index >= listening.dialogue.length || cancelledRef.current) {
+      setIsPlaying(false);
+      setCurrentLine(-1);
+      nextLineRef.current = 0;
+      return;
+    }
+
+    setCurrentLine(index);
+    nextLineRef.current = index + 1;
+    speakOne(listening.dialogue[index].japanese, () => {
+      speakFrom(index + 1);
+    });
+  }
+
+  function pause() {
     cancelledRef.current = true;
+    pausedRef.current = true;
     window.speechSynthesis.cancel();
     setIsPlaying(false);
-    setCurrentLine(-1);
   }
 
   function play() {
     if (isPlaying) {
-      stop();
+      pause();
       return;
     }
 
@@ -143,27 +160,19 @@ export function ListeningSection({
     window.speechSynthesis.cancel();
     setIsPlaying(true);
 
-    function speakLine(index: number) {
-      if (index >= listening.dialogue.length || cancelledRef.current) {
-        setIsPlaying(false);
-        setCurrentLine(-1);
-        return;
-      }
+    const resumeFrom = pausedRef.current ? nextLineRef.current : 0;
+    pausedRef.current = false;
 
-      setCurrentLine(index);
-      speakOne(listening.dialogue[index].japanese, () => {
-        speakLine(index + 1);
-      });
-    }
-
-    speakLine(0);
+    speakFrom(resumeFrom);
   }
 
   function replayLine(index: number) {
     cancelledRef.current = false;
+    pausedRef.current = false;
     window.speechSynthesis.cancel();
     setIsPlaying(true);
     setCurrentLine(index);
+    nextLineRef.current = index + 1;
     speakOne(listening.dialogue[index].japanese, () => {
       setIsPlaying(false);
       setCurrentLine(-1);

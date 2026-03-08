@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Language, JLPTLevel } from "@/lib/types";
+import { Language, JLPTLevel, SectionKey, ALL_SECTIONS } from "@/lib/types";
 
 const STORAGE_KEY = "kurodo-profile";
 
@@ -9,6 +9,7 @@ export interface Profile {
   lang: Language;
   level: JLPTLevel;
   apiKey: string;
+  sections: SectionKey[];
 }
 
 export function useProfile() {
@@ -19,7 +20,10 @@ export function useProfile() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setProfile(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        // Migrate old profiles without sections
+        if (!parsed.sections) parsed.sections = [...ALL_SECTIONS];
+        setProfile(parsed);
       }
     } catch {
       // ignore

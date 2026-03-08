@@ -1,5 +1,8 @@
 export type Language = "en" | "fr" | "de" | "it" | "es" | "pt";
 export type JLPTLevel = "n5" | "n4" | "n3" | "n2" | "n1";
+export type SectionKey = "kanji" | "grammar" | "exercises" | "reading" | "listening";
+
+export const ALL_SECTIONS: SectionKey[] = ["kanji", "grammar", "exercises", "reading", "listening"];
 
 export interface KanjiVocab {
   word: string;
@@ -47,11 +50,11 @@ export interface Exercises {
 }
 
 export interface GeneratedContent {
-  kanji: KanjiOfTheDay;
-  grammar: GrammarOfTheDay;
-  exercises: Exercises;
-  reading: ReadingPassage;
-  listening: ListeningPassage;
+  kanji?: KanjiOfTheDay;
+  grammar?: GrammarOfTheDay;
+  exercises?: Exercises;
+  reading?: ReadingPassage;
+  listening?: ListeningPassage;
 }
 
 export interface ReadingVocab {

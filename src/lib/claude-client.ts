@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { Language, JLPTLevel, GeneratedContent, CorrectionFeedback, KanjiVocab } from "./types";
+import { Language, JLPTLevel, GeneratedContent, CorrectionFeedback, KanjiVocab, SectionKey } from "./types";
 import { languageNames } from "./languages";
 import { buildPrompt, buildCorrectionPrompt, StudyHistory } from "./prompts";
 
@@ -20,12 +20,13 @@ export async function generateStudySession(
   lang: Language,
   level: JLPTLevel,
   history?: StudyHistory,
+  sections?: SectionKey[],
 ): Promise<GeneratedContent> {
   const client = createClient(apiKey);
   const message = await client.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 8192,
-    messages: [{ role: "user", content: buildPrompt(lang, level, history) }],
+    messages: [{ role: "user", content: buildPrompt(lang, level, history, sections) }],
   });
   return JSON.parse(extractText(message));
 }

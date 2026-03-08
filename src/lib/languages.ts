@@ -100,6 +100,10 @@ export const ui: Record<
     normal: string;
     fast: string;
     replayLine: string;
+    sections: string;
+    welcome: string;
+    welcomeSubtitle: string;
+    getStarted: string;
   }
 > = {
   en: {
@@ -177,6 +181,10 @@ export const ui: Record<
     normal: "Normal",
     fast: "Fast",
     replayLine: "Replay",
+    sections: "Lesson Sections",
+    welcome: "Welcome to Kurodo",
+    welcomeSubtitle: "Set up your API key and preferences to get started.",
+    getStarted: "Get Started",
   },
   fr: {
     appTitle: "Kurodo",
@@ -253,6 +261,10 @@ export const ui: Record<
     normal: "Normal",
     fast: "Rapide",
     replayLine: "Réécouter",
+    sections: "Sections de la leçon",
+    welcome: "Bienvenue sur Kurodo",
+    welcomeSubtitle: "Configurez votre clé API et vos préférences pour commencer.",
+    getStarted: "Commencer",
   },
   de: {
     appTitle: "Kurodo",
@@ -329,6 +341,10 @@ export const ui: Record<
     normal: "Normal",
     fast: "Schnell",
     replayLine: "Wiederholen",
+    sections: "Lektionsabschnitte",
+    welcome: "Willkommen bei Kurodo",
+    welcomeSubtitle: "Richten Sie Ihren API-Schlüssel und Ihre Einstellungen ein.",
+    getStarted: "Loslegen",
   },
   it: {
     appTitle: "Kurodo",
@@ -405,6 +421,10 @@ export const ui: Record<
     normal: "Normale",
     fast: "Veloce",
     replayLine: "Riascolta",
+    sections: "Sezioni della lezione",
+    welcome: "Benvenuto su Kurodo",
+    welcomeSubtitle: "Configura la tua chiave API e le preferenze per iniziare.",
+    getStarted: "Inizia",
   },
   es: {
     appTitle: "Kurodo",
@@ -481,6 +501,10 @@ export const ui: Record<
     normal: "Normal",
     fast: "Rápido",
     replayLine: "Repetir",
+    sections: "Secciones de la lección",
+    welcome: "Bienvenido a Kurodo",
+    welcomeSubtitle: "Configura tu clave API y tus preferencias para empezar.",
+    getStarted: "Empezar",
   },
   pt: {
     appTitle: "Kurodo",
@@ -557,6 +581,10 @@ export const ui: Record<
     normal: "Normal",
     fast: "Rápido",
     replayLine: "Repetir",
+    sections: "Secções da lição",
+    welcome: "Bem-vindo ao Kurodo",
+    welcomeSubtitle: "Configure sua chave API e preferências para começar.",
+    getStarted: "Começar",
   },
 };
 

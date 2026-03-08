@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Language, JLPTLevel } from "@/lib/types";
+import { Language, JLPTLevel, SectionKey, ALL_SECTIONS } from "@/lib/types";
 import { ui } from "@/lib/languages";
 import { useGenerate } from "@/hooks/useGenerate";
 import { useProfile } from "@/hooks/useProfile";
@@ -23,12 +23,14 @@ export function StudyPageClient({
   level: JLPTLevel;
 }) {
   const router = useRouter();
-  const { profile, saveProfile } = useProfile();
+  const { profile, loaded, saveProfile } = useProfile();
   const apiKey = profile?.apiKey || "";
+  const sections = profile?.sections || [...ALL_SECTIONS];
   const t = ui[lang];
   const { history, record: recordHistory, reset: resetHistory, progress, levelComplete } = useHistory(level);
   const getHistory = useCallback(() => history, [history]);
-  const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory);
+  const getSections = useCallback(() => sections, [sections]);
+  const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory, getSections);
   const [activeSection, setActiveSection] = useState<
     "kanji" | "grammar" | "exercises" | "reading" | "listening" | null
   >(null);
@@ -37,14 +39,20 @@ export function StudyPageClient({
     "session",
   );
 
+  // Show onboarding if no API key is set
+  const showOnboarding = loaded && !apiKey;
+
   useEffect(() => {
-    saveProfile({ lang, level, apiKey });
+    if (apiKey) {
+      saveProfile({ lang, level, apiKey, sections });
+    }
   }, [lang, level]);
 
   // Record kanji and grammar after each generation
   useEffect(() => {
     if (data) {
-      recordHistory(data.kanji.kanji, data.grammar.title);
+      if (data.kanji) recordHistory(data.kanji.kanji, data.grammar?.title || "");
+      else if (data.grammar) recordHistory("", data.grammar.title);
     }
   }, [data]);
 
@@ -59,18 +67,28 @@ export function StudyPageClient({
 
   function handleNextLevel() {
     if (nextLevel) {
-      saveProfile({ lang, level: nextLevel, apiKey });
+      saveProfile({ lang, level: nextLevel, apiKey, sections });
       router.push(`/${lang}/${nextLevel}`);
     }
   }
 
-  function handleProfileSave(newLang: Language, newLevel: JLPTLevel, newApiKey: string) {
-    saveProfile({ lang: newLang, level: newLevel, apiKey: newApiKey });
+  function handleProfileSave(newLang: Language, newLevel: JLPTLevel, newApiKey: string, newSections: SectionKey[]) {
+    saveProfile({ lang: newLang, level: newLevel, apiKey: newApiKey, sections: newSections });
     setShowProfile(false);
     if (newLang !== lang || newLevel !== level) {
       router.push(`/${newLang}/${newLevel}`);
     }
   }
+
+  const allSections = [
+    { key: "kanji" as const, label: t.kanjiOfTheDay, icon: "漢" },
+    { key: "grammar" as const, label: t.grammarOfTheDay, icon: "文" },
+    { key: "exercises" as const, label: t.writing, icon: "書" },
+    { key: "reading" as const, label: t.reading, icon: "読" },
+    { key: "listening" as const, label: t.listening, icon: "聴" },
+  ];
+
+  const visibleSections = allSections.filter((s) => sections.includes(s.key));
 
   return (
     <div className="min-h-screen flex flex-col px-4 py-6 max-w-lg mx-auto">
@@ -106,11 +124,16 @@ export function StudyPageClient({
         </div>
       </div>
 
-      {/* API Key Warning */}
-      {!apiKey && (
-        <div className="mb-6 px-4 py-3 rounded-lg bg-kurodo-gold/10 border border-kurodo-gold/20 text-kurodo-gold text-sm">
-          {t.apiKeyRequired}
-        </div>
+      {/* Onboarding Modal */}
+      {showOnboarding && (
+        <ProfileModal
+          lang={lang}
+          level={level}
+          apiKey=""
+          sections={[...ALL_SECTIONS]}
+          onSave={handleProfileSave}
+          isOnboarding
+        />
       )}
 
       {/* Tab Navigation */}
@@ -225,91 +248,74 @@ export function StudyPageClient({
           {/* Content */}
           {data && (
             <div className="space-y-3 animate-fade-in">
-              {(
-                [
-                  {
-                    key: "kanji" as const,
-                    label: t.kanjiOfTheDay,
-                    icon: "漢",
-                  },
-                  {
-                    key: "grammar" as const,
-                    label: t.grammarOfTheDay,
-                    icon: "文",
-                  },
-                  {
-                    key: "exercises" as const,
-                    label: t.writing,
-                    icon: "書",
-                  },
-                  {
-                    key: "reading" as const,
-                    label: t.reading,
-                    icon: "読",
-                  },
-                  {
-                    key: "listening" as const,
-                    label: t.listening,
-                    icon: "聴",
-                  },
-                ] as const
-              ).map((section) => (
-                <div key={section.key}>
-                  <button
-                    onClick={() =>
-                      setActiveSection(
-                        activeSection === section.key ? null : section.key,
-                      )
-                    }
-                    className="w-full flex items-center justify-between px-5 py-4 rounded-xl bg-kurodo-card border border-white/5 hover:border-kurodo-red/30 transition-all duration-200"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-kurodo-red text-xl">
-                        {section.icon}
-                      </span>
-                      <span className="text-white font-medium">
-                        {section.label}
-                      </span>
-                    </div>
-                    <span
-                      className={`text-kurodo-muted transition-transform duration-200 ${activeSection === section.key ? "rotate-180" : ""}`}
-                    >
-                      ▾
-                    </span>
-                  </button>
+              {visibleSections.map((section) => {
+                // Skip sections that weren't generated
+                const sectionData = section.key === "kanji" ? data.kanji
+                  : section.key === "grammar" ? data.grammar
+                  : section.key === "exercises" ? data.exercises
+                  : section.key === "reading" ? data.reading
+                  : section.key === "listening" ? data.listening
+                  : null;
+                if (!sectionData) return null;
 
-                  {activeSection === section.key && (
-                    <div className="mt-3 px-1 pb-2">
-                      {section.key === "kanji" && (
-                        <KanjiSection kanji={data.kanji} lang={lang} />
-                      )}
-                      {section.key === "grammar" && (
-                        <GrammarSection grammar={data.grammar} lang={lang} />
-                      )}
-                      {section.key === "exercises" && (
-                        <ExerciseSection
-                          exercises={data.exercises}
-                          lang={lang}
-                          level={level}
-                          apiKey={apiKey}
-                        />
-                      )}
-                      {section.key === "reading" && (
-                        <ReadingSection
-                          reading={data.reading}
-                          lang={lang}
-                        />
-                      )}
-                      {section.key === "listening" && (
-                        <ListeningSection
-                          listening={data.listening}
-                          lang={lang}
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                return (
+                  <div key={section.key}>
+                    <button
+                      onClick={() =>
+                        setActiveSection(
+                          activeSection === section.key ? null : section.key,
+                        )
+                      }
+                      className="w-full flex items-center justify-between px-5 py-4 rounded-xl bg-kurodo-card border border-white/5 hover:border-kurodo-red/30 transition-all duration-200"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-kurodo-red text-xl">
+                          {section.icon}
+                        </span>
+                        <span className="text-white font-medium">
+                          {section.label}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-kurodo-muted transition-transform duration-200 ${activeSection === section.key ? "rotate-180" : ""}`}
+                      >
+                        ▾
+                      </span>
+                    </button>
+
+                    {activeSection === section.key && (
+                      <div className="mt-3 px-1 pb-2">
+                        {section.key === "kanji" && data.kanji && (
+                          <KanjiSection kanji={data.kanji} lang={lang} />
+                        )}
+                        {section.key === "grammar" && data.grammar && (
+                          <GrammarSection grammar={data.grammar} lang={lang} />
+                        )}
+                        {section.key === "exercises" && data.exercises && (
+                          <ExerciseSection
+                            exercises={data.exercises}
+                            lang={lang}
+                            level={level}
+                            apiKey={apiKey}
+                          />
+                        )}
+                        {section.key === "reading" && data.reading && (
+                          <ReadingSection
+                            reading={data.reading}
+                            lang={lang}
+                          />
+                        )}
+                        {section.key === "listening" && data.listening && (
+                          <ListeningSection
+                            listening={data.listening}
+                            lang={lang}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -326,6 +332,7 @@ export function StudyPageClient({
           lang={lang}
           level={level}
           apiKey={apiKey}
+          sections={sections}
           onSave={handleProfileSave}
           onClose={() => setShowProfile(false)}
         />

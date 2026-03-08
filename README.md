@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kurodo (黒道)
+
+AI-powered Japanese learning app for JLPT preparation. Kurodo is the Japanese pronunciation of "Claude", and can also mean "black path" (黒 kuro = black, 道 do = path).
+
+## Features
+
+### Study Sessions
+Generate on-demand study material tailored to your JLPT level (N5–N1):
+- **Kanji of the Day** — a kanji with onyomi, kunyomi, meaning, and 5 vocabulary words
+- **Grammar of the Day** — a concise grammar lesson with structure explanation and 5 examples
+- **Exercises** — 4 types of practice:
+  - Fill in the blank (multiple choice)
+  - Japanese → your language translation (multiple choice)
+  - Your language → Japanese translation (free text, corrected by AI with scoring and feedback)
+  - Kanji meaning (multiple choice)
+
+### Kanji Dictionary
+Browse all 2,211 JLPT kanji organized by level with instant search:
+- Search by kanji character, reading (onyomi/kunyomi), or meaning in your language
+- View readings, meanings, and stroke count — all offline, no API calls
+- Optionally load AI-generated vocabulary examples for any kanji
+
+### Multilingual
+Full localization in 6 languages:
+- English, French, German, Italian, Spanish, Portuguese
+- All UI text, kanji meanings, exercise content, and AI feedback in your selected language
+
+### User Profile
+- Language and JLPT level preferences persisted in local storage
+- Switch anytime via the profile modal
+
+## Tech Stack
+
+- **Next.js 16** (App Router, TypeScript, Tailwind CSS v4)
+- **Claude API** via `@anthropic-ai/sdk` for content generation
+- Static kanji dictionary (260 KB) sourced from [davidluzgouveia/kanji-data](https://github.com/davidluzgouveia/kanji-data)
+- Pre-generated meaning translations for all supported languages (479 KB)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- An [Anthropic API key](https://console.anthropic.com/)
+
+### Setup
 
 ```bash
+# Install dependencies
+npm install
+
+# Set your API key
+echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local
+
+# Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Regenerating Translations
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+If you modify the kanji dataset, regenerate the meaning translations:
 
-## Learn More
+```bash
+npx tsx scripts/generate-translations.ts
+```
 
-To learn more about Next.js, take a look at the following resources:
+This calls the Claude API to translate all kanji meanings into the 5 non-English languages (~130 API calls).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/
+│   ├── page.tsx                  # Language selection (home)
+│   ├── [lang]/page.tsx           # JLPT level selection
+│   ├── [lang]/[level]/page.tsx   # Main study page
+│   └── api/
+│       ├── generate/route.ts     # Study session generation
+│       ├── correct/route.ts      # Translation exercise correction
+│       └── kanji-detail/route.ts # Vocabulary examples for a kanji
+├── components/                   # UI components
+├── hooks/                        # useGenerate, useProfile
+└── lib/
+    ├── kanji-data.ts             # Static kanji dictionary (2,211 entries)
+    ├── kanji-translations.ts     # Localized meanings (5 languages)
+    ├── languages.ts              # UI strings & localization
+    ├── prompts.ts                # Claude prompt templates
+    ├── translate-meaning.ts      # Translation helper
+    └── types.ts                  # TypeScript interfaces
+```
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+MIT — see [LICENSE](LICENSE).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Kanji data derived from [davidluzgouveia/kanji-data](https://github.com/davidluzgouveia/kanji-data) (MIT) — see [LICENSES/kanji-data.txt](LICENSES/kanji-data.txt).

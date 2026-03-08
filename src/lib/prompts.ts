@@ -67,7 +67,7 @@ Generate a complete study session as a single JSON object with this exact struct
   },
   "reading": {
     "title": "<a short title for the passage in Japanese>",
-    "passage": "<a Japanese passage of 4-8 sentences on an interesting topic — daily life, culture, travel, food, seasons, school, work, etc.>",
+    "passage": "<a Japanese passage of 4-8 sentences, using ONLY kanji and grammar appropriate for JLPT ${levelUpper}, on an interesting topic — daily life, culture, travel, food, seasons, school, work, etc.>",
     "passageReading": "<the full passage rewritten entirely in hiragana>",
     "translation": "<full translation of the passage in ${languageName}>",
     "vocabulary": [
@@ -91,6 +91,9 @@ Rules:
 - Pick a random kanji and grammar point — vary your choices
 - For fill-in-the-blank, the blank should test particles, verb forms, or grammatical constructs
 - The reading passage must be 4-8 sentences, cohesive and interesting
+- CRITICAL: The reading passage MUST match JLPT ${levelUpper} level precisely:
+  ${level === "n5" ? "* N5: Use only basic kanji (about 100 kanji), simple verb forms (ます/です), short sentences, everyday topics (self-introduction, shopping, daily routine). Avoid compound sentences." : ""}${level === "n4" ? "* N4: Use basic kanji (about 300 kanji), て-form, たい-form, simple conditionals, everyday topics with slightly more detail (hobbies, travel plans, school life)." : ""}${level === "n3" ? "* N3: Use intermediate kanji (about 650 kanji), passive/causative forms, relative clauses, varied conjunctions, topics like news, opinions, social situations." : ""}${level === "n2" ? "* N2: Use advanced kanji (about 1000 kanji), complex grammar (ものの, にもかかわらず, etc.), abstract topics, newspaper-style writing, longer compound sentences." : ""}${level === "n1" ? "* N1: Use advanced kanji (about 2000 kanji), literary and formal expressions, complex nested clauses, academic or professional topics, nuanced vocabulary." : ""}
+- Only use kanji and grammar structures that a JLPT ${levelUpper} student would have learned — do not exceed the level
 - The reading section must have exactly 6 vocabulary items from the passage
 - The reading section must have exactly 3 comprehension questions in ${languageName} with answers in ${languageName}
 - Comprehension questions should test understanding of the content, not just word lookup

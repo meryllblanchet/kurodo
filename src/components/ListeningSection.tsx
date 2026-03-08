@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import { Language, ListeningPassage } from "@/lib/types";
 import { ui } from "@/lib/languages";
 
 const SPEED_OPTIONS = [
-  { key: "slow", rate: 0.6 },
-  { key: "normal", rate: 0.85 },
-  { key: "fast", rate: 1.1 },
+  { key: "slow", rate: 0.4 },
+  { key: "normal", rate: 0.75 },
+  { key: "fast", rate: 1.5 },
 ] as const;
 
 type SpeedKey = (typeof SPEED_OPTIONS)[number]["key"];
@@ -87,7 +87,6 @@ export function ListeningSection({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentLine, setCurrentLine] = useState(-1);
   const [speed, setSpeed] = useState<SpeedKey>("normal");
-  const lineIndexRef = useRef(0);
   const speedRef = useRef(speed);
   speedRef.current = speed;
 
@@ -97,35 +96,31 @@ export function ListeningSection({
     fast: t.fast,
   };
 
-  const getRate = useCallback(() => {
+  function getRate() {
     return SPEED_OPTIONS.find((s) => s.key === speedRef.current)!.rate;
-  }, []);
+  }
 
-  const stop = useCallback(() => {
+  function speakOne(text: string, onEnd?: () => void) {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = "ja-JP";
+    const voice = getJapaneseVoice();
+    if (voice) utt.voice = voice;
+    utt.rate = getRate();
+    if (onEnd) utt.onend = onEnd;
+    utt.onerror = () => {
+      setIsPlaying(false);
+      setCurrentLine(-1);
+    };
+    window.speechSynthesis.speak(utt);
+  }
+
+  function stop() {
     window.speechSynthesis.cancel();
     setIsPlaying(false);
     setCurrentLine(-1);
-    lineIndexRef.current = 0;
-  }, []);
+  }
 
-  const speakText = useCallback(
-    (text: string, onEnd?: () => void) => {
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = "ja-JP";
-      const voice = getJapaneseVoice();
-      if (voice) utt.voice = voice;
-      utt.rate = getRate();
-      if (onEnd) utt.onend = onEnd;
-      utt.onerror = () => {
-        setIsPlaying(false);
-        setCurrentLine(-1);
-      };
-      window.speechSynthesis.speak(utt);
-    },
-    [getRate],
-  );
-
-  const play = useCallback(() => {
+  function play() {
     if (isPlaying) {
       stop();
       return;
@@ -133,7 +128,6 @@ export function ListeningSection({
 
     window.speechSynthesis.cancel();
     setIsPlaying(true);
-    lineIndexRef.current = 0;
 
     function speakLine(index: number) {
       if (index >= listening.dialogue.length) {
@@ -143,28 +137,23 @@ export function ListeningSection({
       }
 
       setCurrentLine(index);
-      const line = listening.dialogue[index];
-      speakText(line.japanese, () => {
-        lineIndexRef.current = index + 1;
+      speakOne(listening.dialogue[index].japanese, () => {
         speakLine(index + 1);
       });
     }
 
     speakLine(0);
-  }, [isPlaying, listening.dialogue, stop, speakText]);
+  }
 
-  const replayLine = useCallback(
-    (index: number) => {
-      window.speechSynthesis.cancel();
-      setIsPlaying(true);
-      setCurrentLine(index);
-      speakText(listening.dialogue[index].japanese, () => {
-        setIsPlaying(false);
-        setCurrentLine(-1);
-      });
-    },
-    [listening.dialogue, speakText],
-  );
+  function replayLine(index: number) {
+    window.speechSynthesis.cancel();
+    setIsPlaying(true);
+    setCurrentLine(index);
+    speakOne(listening.dialogue[index].japanese, () => {
+      setIsPlaying(false);
+      setCurrentLine(-1);
+    });
+  }
 
   return (
     <div className="animate-fade-in space-y-5">

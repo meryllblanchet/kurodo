@@ -104,6 +104,11 @@ export const ui: Record<
     welcome: string;
     welcomeSubtitle: string;
     getStarted: string;
+    history: string;
+    noHistory: string;
+    deleteSession: string;
+    today: string;
+    yesterday: string;
   }
 > = {
   en: {
@@ -185,6 +190,11 @@ export const ui: Record<
     welcome: "Welcome to Kurodo",
     welcomeSubtitle: "Set up your API key and preferences to get started.",
     getStarted: "Get Started",
+    history: "History",
+    noHistory: "No past sessions yet. Generate your first lesson!",
+    deleteSession: "Delete",
+    today: "Today",
+    yesterday: "Yesterday",
   },
   fr: {
     appTitle: "Kurodo",
@@ -265,6 +275,11 @@ export const ui: Record<
     welcome: "Bienvenue sur Kurodo",
     welcomeSubtitle: "Configurez votre clé API et vos préférences pour commencer.",
     getStarted: "Commencer",
+    history: "Historique",
+    noHistory: "Aucune session passée. Générez votre première leçon !",
+    deleteSession: "Supprimer",
+    today: "Aujourd'hui",
+    yesterday: "Hier",
   },
   de: {
     appTitle: "Kurodo",
@@ -345,6 +360,11 @@ export const ui: Record<
     welcome: "Willkommen bei Kurodo",
     welcomeSubtitle: "Richten Sie Ihren API-Schlüssel und Ihre Einstellungen ein.",
     getStarted: "Loslegen",
+    history: "Verlauf",
+    noHistory: "Noch keine vergangenen Sitzungen. Erstellen Sie Ihre erste Lektion!",
+    deleteSession: "Löschen",
+    today: "Heute",
+    yesterday: "Gestern",
   },
   it: {
     appTitle: "Kurodo",
@@ -425,6 +445,11 @@ export const ui: Record<
     welcome: "Benvenuto su Kurodo",
     welcomeSubtitle: "Configura la tua chiave API e le preferenze per iniziare.",
     getStarted: "Inizia",
+    history: "Cronologia",
+    noHistory: "Nessuna sessione passata. Genera la tua prima lezione!",
+    deleteSession: "Elimina",
+    today: "Oggi",
+    yesterday: "Ieri",
   },
   es: {
     appTitle: "Kurodo",
@@ -505,6 +530,11 @@ export const ui: Record<
     welcome: "Bienvenido a Kurodo",
     welcomeSubtitle: "Configura tu clave API y tus preferencias para empezar.",
     getStarted: "Empezar",
+    history: "Historial",
+    noHistory: "No hay sesiones anteriores. ¡Genera tu primera lección!",
+    deleteSession: "Eliminar",
+    today: "Hoy",
+    yesterday: "Ayer",
   },
   pt: {
     appTitle: "Kurodo",
@@ -585,6 +615,11 @@ export const ui: Record<
     welcome: "Bem-vindo ao Kurodo",
     welcomeSubtitle: "Configure sua chave API e preferências para começar.",
     getStarted: "Começar",
+    history: "Histórico",
+    noHistory: "Nenhuma sessão anterior. Gere sua primeira lição!",
+    deleteSession: "Excluir",
+    today: "Hoje",
+    yesterday: "Ontem",
   },
 };
 

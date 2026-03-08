@@ -2,18 +2,33 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Language, JLPTLevel, SectionKey, ALL_SECTIONS } from "@/lib/types";
+import { Language, JLPTLevel, SectionKey, ALL_SECTIONS, GeneratedContent } from "@/lib/types";
 import { ui } from "@/lib/languages";
 import { useGenerate } from "@/hooks/useGenerate";
 import { useProfile } from "@/hooks/useProfile";
 import { useHistory } from "@/hooks/useHistory";
-import { KanjiSection } from "@/components/KanjiSection";
-import { GrammarSection } from "@/components/GrammarSection";
-import { ExerciseSection } from "@/components/ExerciseSection";
+import { useSessionHistory, SavedSession } from "@/hooks/useSessionHistory";
 import { ProfileModal } from "@/components/ProfileModal";
 import { KanjiGrid } from "@/components/KanjiGrid";
-import { ReadingSection } from "@/components/ReadingSection";
-import { ListeningSection } from "@/components/ListeningSection";
+import { SessionContent } from "@/components/SessionContent";
+
+function formatDate(ts: number, t: { today: string; yesterday: string }) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
+  if (diffDays === 0) return t.today;
+  if (diffDays === 1) return t.yesterday;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function sessionSummary(content: GeneratedContent): string {
+  const parts: string[] = [];
+  if (content.kanji) parts.push(content.kanji.kanji);
+  if (content.grammar) parts.push(content.grammar.title);
+  if (content.reading) parts.push(content.reading.title);
+  if (content.listening) parts.push(content.listening.title);
+  return parts.join(" · ") || "—";
+}
 
 export function StudyPageClient({
   lang,
@@ -28,18 +43,14 @@ export function StudyPageClient({
   const sections = profile?.sections || [...ALL_SECTIONS];
   const t = ui[lang];
   const { history, record: recordHistory, reset: resetHistory, progress, levelComplete } = useHistory(level);
+  const { sessions, save: saveSession, remove: removeSession } = useSessionHistory(level);
   const getHistory = useCallback(() => history, [history]);
   const getSections = useCallback(() => sections, [sections]);
   const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory, getSections);
-  const [activeSection, setActiveSection] = useState<
-    "kanji" | "grammar" | "exercises" | "reading" | "listening" | null
-  >(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [activeTab, setActiveTab] = useState<"session" | "dictionary">(
-    "session",
-  );
+  const [activeTab, setActiveTab] = useState<"session" | "history" | "dictionary">("session");
+  const [reviewSession, setReviewSession] = useState<SavedSession | null>(null);
 
-  // Show onboarding if no API key is set
   const showOnboarding = loaded && !apiKey;
 
   useEffect(() => {
@@ -48,11 +59,12 @@ export function StudyPageClient({
     }
   }, [lang, level]);
 
-  // Record kanji and grammar after each generation
+  // Record history and save session after each generation
   useEffect(() => {
     if (data) {
       if (data.kanji) recordHistory(data.kanji.kanji, data.grammar?.title || "");
       else if (data.grammar) recordHistory("", data.grammar.title);
+      saveSession(data);
     }
   }, [data]);
 
@@ -80,16 +92,6 @@ export function StudyPageClient({
     }
   }
 
-  const allSections = [
-    { key: "kanji" as const, label: t.kanjiOfTheDay, icon: "漢" },
-    { key: "grammar" as const, label: t.grammarOfTheDay, icon: "文" },
-    { key: "exercises" as const, label: t.writing, icon: "書" },
-    { key: "reading" as const, label: t.reading, icon: "読" },
-    { key: "listening" as const, label: t.listening, icon: "聴" },
-  ];
-
-  const visibleSections = allSections.filter((s) => sections.includes(s.key));
-
   return (
     <div className="min-h-screen flex flex-col px-4 py-6 max-w-lg mx-auto">
       {/* Header */}
@@ -107,16 +109,7 @@ export function StudyPageClient({
             className="w-9 h-9 rounded-full bg-kurodo-card border border-white/10 hover:border-kurodo-red/40 flex items-center justify-center transition-all duration-200 text-kurodo-muted hover:text-white"
             title={t.profile}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
@@ -138,26 +131,28 @@ export function StudyPageClient({
 
       {/* Tab Navigation */}
       <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setActiveTab("session")}
-          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-            activeTab === "session"
-              ? "bg-kurodo-red text-white"
-              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
-          }`}
-        >
-          {t.studySession}
-        </button>
-        <button
-          onClick={() => setActiveTab("dictionary")}
-          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-            activeTab === "dictionary"
-              ? "bg-kurodo-red text-white"
-              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
-          }`}
-        >
-          {t.kanjiDictionary}
-        </button>
+        {(
+          [
+            { key: "session" as const, label: t.studySession },
+            { key: "history" as const, label: t.history },
+            { key: "dictionary" as const, label: t.kanjiDictionary },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => {
+              setActiveTab(tab.key);
+              if (tab.key !== "history") setReviewSession(null);
+            }}
+            className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
+              activeTab === tab.key
+                ? "bg-kurodo-red text-white"
+                : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Study Session Tab */}
@@ -247,75 +242,75 @@ export function StudyPageClient({
 
           {/* Content */}
           {data && (
-            <div className="space-y-3 animate-fade-in">
-              {visibleSections.map((section) => {
-                // Skip sections that weren't generated
-                const sectionData = section.key === "kanji" ? data.kanji
-                  : section.key === "grammar" ? data.grammar
-                  : section.key === "exercises" ? data.exercises
-                  : section.key === "reading" ? data.reading
-                  : section.key === "listening" ? data.listening
-                  : null;
-                if (!sectionData) return null;
+            <SessionContent
+              data={data}
+              lang={lang}
+              level={level}
+              apiKey={apiKey}
+              sections={sections}
+            />
+          )}
+        </div>
+      )}
 
-                return (
-                  <div key={section.key}>
-                    <button
-                      onClick={() =>
-                        setActiveSection(
-                          activeSection === section.key ? null : section.key,
-                        )
-                      }
-                      className="w-full flex items-center justify-between px-5 py-4 rounded-xl bg-kurodo-card border border-white/5 hover:border-kurodo-red/30 transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-kurodo-red text-xl">
-                          {section.icon}
-                        </span>
-                        <span className="text-white font-medium">
-                          {section.label}
-                        </span>
-                      </div>
-                      <span
-                        className={`text-kurodo-muted transition-transform duration-200 ${activeSection === section.key ? "rotate-180" : ""}`}
-                      >
-                        ▾
-                      </span>
-                    </button>
-
-                    {activeSection === section.key && (
-                      <div className="mt-3 px-1 pb-2">
-                        {section.key === "kanji" && data.kanji && (
-                          <KanjiSection kanji={data.kanji} lang={lang} />
-                        )}
-                        {section.key === "grammar" && data.grammar && (
-                          <GrammarSection grammar={data.grammar} lang={lang} />
-                        )}
-                        {section.key === "exercises" && data.exercises && (
-                          <ExerciseSection
-                            exercises={data.exercises}
-                            lang={lang}
-                            level={level}
-                            apiKey={apiKey}
-                          />
-                        )}
-                        {section.key === "reading" && data.reading && (
-                          <ReadingSection
-                            reading={data.reading}
-                            lang={lang}
-                          />
-                        )}
-                        {section.key === "listening" && data.listening && (
-                          <ListeningSection
-                            listening={data.listening}
-                            lang={lang}
-                          />
-                        )}
-                      </div>
-                    )}
+      {/* History Tab */}
+      {activeTab === "history" && (
+        <div>
+          {reviewSession ? (
+            <div>
+              {/* Back button and date */}
+              <button
+                onClick={() => setReviewSession(null)}
+                className="text-kurodo-muted hover:text-white transition-colors text-sm mb-4 flex items-center gap-1"
+              >
+                <span>←</span> {t.back}
+              </button>
+              <p className="text-kurodo-muted text-xs mb-4">
+                {new Date(reviewSession.timestamp).toLocaleString()}
+              </p>
+              <SessionContent
+                data={reviewSession.content}
+                lang={lang}
+                level={level}
+                apiKey={apiKey}
+                sections={ALL_SECTIONS}
+              />
+            </div>
+          ) : sessions.length === 0 ? (
+            <p className="text-kurodo-muted text-sm text-center py-12">
+              {t.noHistory}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {sessions.map((session) => (
+                <div
+                  key={session.id}
+                  className="flex items-center gap-3 px-4 py-4 rounded-xl bg-kurodo-card border border-white/5 hover:border-kurodo-red/30 transition-all duration-200 cursor-pointer"
+                  onClick={() => setReviewSession(session)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium truncate">
+                      {sessionSummary(session.content)}
+                    </p>
+                    <p className="text-kurodo-muted text-xs mt-0.5">
+                      {formatDate(session.timestamp, t)} · {new Date(session.timestamp).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+                    </p>
                   </div>
-                );
-              })}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeSession(session.id);
+                    }}
+                    className="shrink-0 text-kurodo-muted hover:text-red-400 transition-colors p-1"
+                    title={t.deleteSession}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>

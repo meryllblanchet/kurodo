@@ -50,6 +50,7 @@ export interface GeneratedContent {
   kanji: KanjiOfTheDay;
   grammar: GrammarOfTheDay;
   exercises: Exercises;
+  reading: ReadingPassage;
 }
 
 export interface ReadingVocab {

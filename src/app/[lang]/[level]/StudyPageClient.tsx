@@ -29,10 +29,10 @@ export function StudyPageClient({
   const getHistory = useCallback(() => history, [history]);
   const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory);
   const [activeSection, setActiveSection] = useState<
-    "kanji" | "grammar" | "exercises" | null
+    "kanji" | "grammar" | "exercises" | "reading" | null
   >(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [activeTab, setActiveTab] = useState<"session" | "reading" | "dictionary">(
+  const [activeTab, setActiveTab] = useState<"session" | "dictionary">(
     "session",
   );
 
@@ -123,16 +123,6 @@ export function StudyPageClient({
           }`}
         >
           {t.studySession}
-        </button>
-        <button
-          onClick={() => setActiveTab("reading")}
-          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${
-            activeTab === "reading"
-              ? "bg-kurodo-red text-white"
-              : "bg-kurodo-card border border-white/5 text-kurodo-muted hover:text-white"
-          }`}
-        >
-          {t.reading}
         </button>
         <button
           onClick={() => setActiveTab("dictionary")}
@@ -251,6 +241,11 @@ export function StudyPageClient({
                     label: t.exercises,
                     icon: "練",
                   },
+                  {
+                    key: "reading" as const,
+                    label: t.reading,
+                    icon: "読",
+                  },
                 ] as const
               ).map((section) => (
                 <div key={section.key}>
@@ -293,6 +288,12 @@ export function StudyPageClient({
                           apiKey={apiKey}
                         />
                       )}
+                      {section.key === "reading" && (
+                        <ReadingSection
+                          reading={data.reading}
+                          lang={lang}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -300,11 +301,6 @@ export function StudyPageClient({
             </div>
           )}
         </div>
-      )}
-
-      {/* Reading Tab */}
-      {activeTab === "reading" && (
-        <ReadingSection lang={lang} level={level} apiKey={apiKey} />
       )}
 
       {/* Kanji Dictionary Tab */}

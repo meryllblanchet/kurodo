@@ -64,6 +64,18 @@ Generate a complete study session as a single JSON object with this exact struct
     "kanjiMeaning": [
       { "question": "<kanji or kanji compound>", "choices": ["<meaning a>","<meaning b>","<meaning c>","<meaning d>"], "correctIndex": <0-3> }
     ]
+  },
+  "reading": {
+    "title": "<a short title for the passage in Japanese>",
+    "passage": "<a Japanese passage of 4-8 sentences on an interesting topic — daily life, culture, travel, food, seasons, school, work, etc.>",
+    "passageReading": "<the full passage rewritten entirely in hiragana>",
+    "translation": "<full translation of the passage in ${languageName}>",
+    "vocabulary": [
+      { "word": "<key word from the passage>", "reading": "<reading in hiragana>", "meaning": "<meaning in ${languageName}>" }
+    ],
+    "questions": [
+      { "question": "<comprehension question in ${languageName}>", "choices": ["<a>","<b>","<c>","<d>"], "correctIndex": <0-3> }
+    ]
   }
 }
 
@@ -78,6 +90,10 @@ Rules:
 - Make the wrong MCQ choices plausible but clearly incorrect
 - Pick a random kanji and grammar point — vary your choices
 - For fill-in-the-blank, the blank should test particles, verb forms, or grammatical constructs
+- The reading passage must be 4-8 sentences, cohesive and interesting
+- The reading section must have exactly 6 vocabulary items from the passage
+- The reading section must have exactly 3 comprehension questions in ${languageName} with answers in ${languageName}
+- Comprehension questions should test understanding of the content, not just word lookup
 - Respond with ONLY the JSON object. No markdown, no code fences, no additional text.${buildHistorySection(history)}`;
 }
 
@@ -125,35 +141,3 @@ Rules:
 - Respond with ONLY the JSON object. No markdown, no code fences, no additional text.`;
 }
 
-export function buildReadingPrompt(lang: Language, level: JLPTLevel): string {
-  const languageName = languageNames[lang];
-  const levelUpper = level.toUpperCase();
-
-  return `You are an expert Japanese language teacher creating a reading exercise for a JLPT ${levelUpper} student.
-The student's native language is ${languageName}.
-
-Generate a short reading passage with comprehension questions as a JSON object:
-
-{
-  "title": "<a short title for the passage in Japanese>",
-  "passage": "<a Japanese passage of 4-8 sentences, appropriate for JLPT ${levelUpper}. Use natural Japanese with kanji appropriate for the level. The topic should be interesting — daily life, culture, travel, food, seasons, school, work, etc.>",
-  "passageReading": "<the full passage rewritten entirely in hiragana>",
-  "translation": "<full translation of the passage in ${languageName}>",
-  "vocabulary": [
-    { "word": "<key word from the passage>", "reading": "<reading in hiragana>", "meaning": "<meaning in ${languageName}>" }
-  ],
-  "questions": [
-    { "question": "<comprehension question in ${languageName} about the passage>", "choices": ["<a>","<b>","<c>","<d>"], "correctIndex": <0-3> }
-  ]
-}
-
-Rules:
-- The passage should be 4-8 sentences, cohesive and interesting to read
-- Use grammar and vocabulary appropriate for JLPT ${levelUpper}
-- Provide exactly 6 vocabulary items — pick the most useful or challenging words from the passage
-- Provide exactly 3 comprehension questions in ${languageName} with answers in ${languageName}
-- Questions should test understanding of the content, not just word lookup
-- Vary the correctIndex across questions
-- Pick a random topic — vary your choices
-- Respond with ONLY the JSON object. No markdown, no code fences, no additional text.`;
-}

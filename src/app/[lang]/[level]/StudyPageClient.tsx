@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Language, JLPTLevel } from "@/lib/types";
 import { ui } from "@/lib/languages";
 import { useGenerate } from "@/hooks/useGenerate";
 import { useProfile } from "@/hooks/useProfile";
+import { useHistory } from "@/hooks/useHistory";
 import { KanjiSection } from "@/components/KanjiSection";
 import { GrammarSection } from "@/components/GrammarSection";
 import { ExerciseSection } from "@/components/ExerciseSection";
@@ -23,7 +24,9 @@ export function StudyPageClient({
   const { profile, saveProfile } = useProfile();
   const apiKey = profile?.apiKey || "";
   const t = ui[lang];
-  const { data, loading, error, generate } = useGenerate(lang, level, apiKey);
+  const { history, record: recordHistory } = useHistory(level);
+  const getHistory = useCallback(() => history, [history]);
+  const { data, loading, error, generate } = useGenerate(lang, level, apiKey, getHistory);
   const [activeSection, setActiveSection] = useState<
     "kanji" | "grammar" | "exercises" | null
   >(null);
@@ -35,6 +38,13 @@ export function StudyPageClient({
   useEffect(() => {
     saveProfile({ lang, level, apiKey });
   }, [lang, level]);
+
+  // Record kanji and grammar after each generation
+  useEffect(() => {
+    if (data) {
+      recordHistory(data.kanji.kanji, data.grammar.title);
+    }
+  }, [data]);
 
   function handleProfileSave(newLang: Language, newLevel: JLPTLevel, newApiKey: string) {
     saveProfile({ lang: newLang, level: newLevel, apiKey: newApiKey });

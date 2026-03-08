@@ -1,7 +1,29 @@
 import { Language, JLPTLevel } from "./types";
 import { languageNames } from "./languages";
 
-export function buildPrompt(lang: Language, level: JLPTLevel): string {
+export interface StudyHistory {
+  kanji: string[];
+  grammar: string[];
+}
+
+function buildHistorySection(history?: StudyHistory): string {
+  if (!history) return "";
+  const parts: string[] = [];
+  if (history.kanji.length > 0) {
+    parts.push(`- Kanji already covered: ${history.kanji.join(", ")}`);
+  }
+  if (history.grammar.length > 0) {
+    parts.push(`- Grammar points already covered: ${history.grammar.join(", ")}`);
+  }
+  if (parts.length === 0) return "";
+  return `
+
+IMPORTANT — AVOID REPETITION:
+The student has already studied the following items in previous sessions. Do NOT reuse them. Pick different kanji and grammar points.
+${parts.join("\n")}`;
+}
+
+export function buildPrompt(lang: Language, level: JLPTLevel, history?: StudyHistory): string {
   const languageName = languageNames[lang];
   const levelUpper = level.toUpperCase();
 
@@ -56,7 +78,7 @@ Rules:
 - Make the wrong MCQ choices plausible but clearly incorrect
 - Pick a random kanji and grammar point — vary your choices
 - For fill-in-the-blank, the blank should test particles, verb forms, or grammatical constructs
-- Respond with ONLY the JSON object. No markdown, no code fences, no additional text.`;
+- Respond with ONLY the JSON object. No markdown, no code fences, no additional text.${buildHistorySection(history)}`;
 }
 
 export function buildCorrectionPrompt(

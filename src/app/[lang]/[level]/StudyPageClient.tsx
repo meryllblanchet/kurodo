@@ -238,8 +238,8 @@ export function StudyPageClient({
                   },
                   {
                     key: "exercises" as const,
-                    label: t.exercises,
-                    icon: "練",
+                    label: t.writing,
+                    icon: "書",
                   },
                   {
                     key: "reading" as const,

@@ -248,7 +248,7 @@ export function ExerciseSection({
   return (
     <div className="animate-fade-in">
       <h2 className="text-lg font-bold text-kurodo-gold mb-4 flex items-center gap-2">
-        <span className="text-kurodo-red">練</span> {t.exercises}
+        <span className="text-kurodo-red">書</span> {t.writing}
       </h2>
 
       <div className="flex gap-1 mb-4 overflow-x-auto pb-2 -mx-1 px-1">

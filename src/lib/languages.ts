@@ -33,7 +33,7 @@ export const ui: Record<
     generating: string;
     kanjiOfTheDay: string;
     grammarOfTheDay: string;
-    exercises: string;
+    writing: string;
     onyomi: string;
     kunyomi: string;
     meaning: string;
@@ -100,7 +100,7 @@ export const ui: Record<
     generating: "Generating...",
     kanjiOfTheDay: "Kanji of the Day",
     grammarOfTheDay: "Grammar of the Day",
-    exercises: "Exercises",
+    writing: "Writing",
     onyomi: "On'yomi",
     kunyomi: "Kun'yomi",
     meaning: "Meaning",
@@ -166,7 +166,7 @@ export const ui: Record<
     generating: "Génération en cours...",
     kanjiOfTheDay: "Kanji du jour",
     grammarOfTheDay: "Grammaire du jour",
-    exercises: "Exercices",
+    writing: "Écriture",
     onyomi: "On'yomi",
     kunyomi: "Kun'yomi",
     meaning: "Signification",
@@ -232,7 +232,7 @@ export const ui: Record<
     generating: "Wird generiert...",
     kanjiOfTheDay: "Kanji des Tages",
     grammarOfTheDay: "Grammatik des Tages",
-    exercises: "Übungen",
+    writing: "Schreiben",
     onyomi: "On'yomi",
     kunyomi: "Kun'yomi",
     meaning: "Bedeutung",
@@ -298,7 +298,7 @@ export const ui: Record<
     generating: "Generazione in corso...",
     kanjiOfTheDay: "Kanji del giorno",
     grammarOfTheDay: "Grammatica del giorno",
-    exercises: "Esercizi",
+    writing: "Scrittura",
     onyomi: "On'yomi",
     kunyomi: "Kun'yomi",
     meaning: "Significato",
@@ -364,7 +364,7 @@ export const ui: Record<
     generating: "Generando...",
     kanjiOfTheDay: "Kanji del día",
     grammarOfTheDay: "Gramática del día",
-    exercises: "Ejercicios",
+    writing: "Escritura",
     onyomi: "On'yomi",
     kunyomi: "Kun'yomi",
     meaning: "Significado",
@@ -430,7 +430,7 @@ export const ui: Record<
     generating: "Gerando...",
     kanjiOfTheDay: "Kanji do dia",
     grammarOfTheDay: "Gramática do dia",
-    exercises: "Exercícios",
+    writing: "Escrita",
     onyomi: "On'yomi",
     kunyomi: "Kun'yomi",
     meaning: "Significado",

@@ -66,12 +66,25 @@ function MCQQuestion({
   );
 }
 
-function getJapaneseVoice(): SpeechSynthesisVoice | undefined {
+function getJapaneseVoices(): [SpeechSynthesisVoice | undefined, SpeechSynthesisVoice | undefined] {
   const voices = window.speechSynthesis.getVoices();
-  return (
-    voices.find((v) => v.lang.startsWith("ja") && v.localService) ||
-    voices.find((v) => v.lang.startsWith("ja"))
-  );
+  const jpVoices = voices.filter((v) => v.lang.startsWith("ja"));
+
+  // Try to find two distinct voices (e.g. Kyoko=female, Otoya=male on macOS)
+  if (jpVoices.length >= 2) {
+    // Prefer local voices, pick two different ones
+    const local = jpVoices.filter((v) => v.localService);
+    if (local.length >= 2) return [local[0], local[1]];
+    if (local.length === 1) {
+      const other = jpVoices.find((v) => v !== local[0]);
+      return [local[0], other || local[0]];
+    }
+    return [jpVoices[0], jpVoices[1]];
+  }
+
+  // Only one voice available — use it for both, differentiate with pitch
+  const single = jpVoices[0];
+  return [single, single];
 }
 
 export function ListeningSection({
@@ -100,17 +113,32 @@ export function ListeningSection({
   const pausedRef = useRef(false);
   const nextLineRef = useRef(0);
 
+  // Map the two speakers to two voices
+  const speakerVoiceMap = useRef<Map<string, { voice?: SpeechSynthesisVoice; pitch: number }>>(new Map());
+
+  function getSpeakerConfig(speaker: string) {
+    if (speakerVoiceMap.current.size === 0) {
+      const [voice1, voice2] = getJapaneseVoices();
+      const speakers = [...new Set(listening.dialogue.map((l) => l.speaker))];
+      const sameVoice = voice1 === voice2;
+      if (speakers[0]) speakerVoiceMap.current.set(speakers[0], { voice: voice1, pitch: sameVoice ? 1.2 : 1.0 });
+      if (speakers[1]) speakerVoiceMap.current.set(speakers[1], { voice: voice2, pitch: sameVoice ? 0.7 : 1.0 });
+    }
+    return speakerVoiceMap.current.get(speaker) || { voice: undefined, pitch: 1.0 };
+  }
+
   function getSpeedConfig() {
     return SPEED_OPTIONS.find((s) => s.key === speedRef.current)!;
   }
 
-  function speakOne(text: string, onEnd?: () => void) {
+  function speakOne(text: string, speaker: string, onEnd?: () => void) {
     const cfg = getSpeedConfig();
+    const { voice, pitch } = getSpeakerConfig(speaker);
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = "ja-JP";
-    const voice = getJapaneseVoice();
     if (voice) utt.voice = voice;
     utt.rate = cfg.rate;
+    utt.pitch = pitch;
     utt.onend = () => {
       if (onEnd && !cancelledRef.current) {
         const delay = cfg.pause;
@@ -136,9 +164,10 @@ export function ListeningSection({
       return;
     }
 
+    const line = listening.dialogue[index];
     setCurrentLine(index);
     nextLineRef.current = index + 1;
-    speakOne(listening.dialogue[index].japanese, () => {
+    speakOne(line.japanese, line.speaker, () => {
       speakFrom(index + 1);
     });
   }
@@ -170,10 +199,11 @@ export function ListeningSection({
     cancelledRef.current = false;
     pausedRef.current = false;
     window.speechSynthesis.cancel();
+    const line = listening.dialogue[index];
     setIsPlaying(true);
     setCurrentLine(index);
     nextLineRef.current = index + 1;
-    speakOne(listening.dialogue[index].japanese, () => {
+    speakOne(line.japanese, line.speaker, () => {
       setIsPlaying(false);
       setCurrentLine(-1);
     });

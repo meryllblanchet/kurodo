@@ -96,6 +96,10 @@ export const ui: Record<
     showTranscript: string;
     hideTranscript: string;
     situation: string;
+    slow: string;
+    normal: string;
+    fast: string;
+    replayLine: string;
   }
 > = {
   en: {
@@ -169,6 +173,10 @@ export const ui: Record<
     showTranscript: "Show Transcript",
     hideTranscript: "Hide Transcript",
     situation: "Situation",
+    slow: "Slow",
+    normal: "Normal",
+    fast: "Fast",
+    replayLine: "Replay",
   },
   fr: {
     appTitle: "Kurodo",
@@ -241,6 +249,10 @@ export const ui: Record<
     showTranscript: "Afficher la transcription",
     hideTranscript: "Masquer la transcription",
     situation: "Situation",
+    slow: "Lent",
+    normal: "Normal",
+    fast: "Rapide",
+    replayLine: "Réécouter",
   },
   de: {
     appTitle: "Kurodo",
@@ -313,6 +325,10 @@ export const ui: Record<
     showTranscript: "Transkript anzeigen",
     hideTranscript: "Transkript verbergen",
     situation: "Situation",
+    slow: "Langsam",
+    normal: "Normal",
+    fast: "Schnell",
+    replayLine: "Wiederholen",
   },
   it: {
     appTitle: "Kurodo",
@@ -385,6 +401,10 @@ export const ui: Record<
     showTranscript: "Mostra trascrizione",
     hideTranscript: "Nascondi trascrizione",
     situation: "Situazione",
+    slow: "Lento",
+    normal: "Normale",
+    fast: "Veloce",
+    replayLine: "Riascolta",
   },
   es: {
     appTitle: "Kurodo",
@@ -457,6 +477,10 @@ export const ui: Record<
     showTranscript: "Mostrar transcripción",
     hideTranscript: "Ocultar transcripción",
     situation: "Situación",
+    slow: "Lento",
+    normal: "Normal",
+    fast: "Rápido",
+    replayLine: "Repetir",
   },
   pt: {
     appTitle: "Kurodo",
@@ -529,6 +553,10 @@ export const ui: Record<
     showTranscript: "Mostrar transcrição",
     hideTranscript: "Ocultar transcrição",
     situation: "Situação",
+    slow: "Lento",
+    normal: "Normal",
+    fast: "Rápido",
+    replayLine: "Repetir",
   },
 };
 

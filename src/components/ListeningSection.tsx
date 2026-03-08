@@ -4,6 +4,14 @@ import { useState, useRef, useCallback } from "react";
 import { Language, ListeningPassage } from "@/lib/types";
 import { ui } from "@/lib/languages";
 
+const SPEED_OPTIONS = [
+  { key: "slow", rate: 0.6 },
+  { key: "normal", rate: 0.85 },
+  { key: "fast", rate: 1.1 },
+] as const;
+
+type SpeedKey = (typeof SPEED_OPTIONS)[number]["key"];
+
 function MCQQuestion({
   question,
   choices,
@@ -58,6 +66,14 @@ function MCQQuestion({
   );
 }
 
+function getJapaneseVoice(): SpeechSynthesisVoice | undefined {
+  const voices = window.speechSynthesis.getVoices();
+  return (
+    voices.find((v) => v.lang.startsWith("ja") && v.localService) ||
+    voices.find((v) => v.lang.startsWith("ja"))
+  );
+}
+
 export function ListeningSection({
   listening,
   lang,
@@ -70,8 +86,20 @@ export function ListeningSection({
   const [showTranslation, setShowTranslation] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentLine, setCurrentLine] = useState(-1);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [speed, setSpeed] = useState<SpeedKey>("normal");
   const lineIndexRef = useRef(0);
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
+
+  const speedLabels: Record<SpeedKey, string> = {
+    slow: t.slow,
+    normal: t.normal,
+    fast: t.fast,
+  };
+
+  const getRate = useCallback(() => {
+    return SPEED_OPTIONS.find((s) => s.key === speedRef.current)!.rate;
+  }, []);
 
   const stop = useCallback(() => {
     window.speechSynthesis.cancel();
@@ -80,20 +108,30 @@ export function ListeningSection({
     lineIndexRef.current = 0;
   }, []);
 
+  const speakText = useCallback(
+    (text: string, onEnd?: () => void) => {
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = "ja-JP";
+      const voice = getJapaneseVoice();
+      if (voice) utt.voice = voice;
+      utt.rate = getRate();
+      if (onEnd) utt.onend = onEnd;
+      utt.onerror = () => {
+        setIsPlaying(false);
+        setCurrentLine(-1);
+      };
+      window.speechSynthesis.speak(utt);
+    },
+    [getRate],
+  );
+
   const play = useCallback(() => {
     if (isPlaying) {
       stop();
       return;
     }
 
-    const synth = window.speechSynthesis;
-    synth.cancel();
-
-    const voices = synth.getVoices();
-    const jpVoice = voices.find(
-      (v) => v.lang.startsWith("ja") && v.localService,
-    ) || voices.find((v) => v.lang.startsWith("ja"));
-
+    window.speechSynthesis.cancel();
     setIsPlaying(true);
     lineIndexRef.current = 0;
 
@@ -106,26 +144,27 @@ export function ListeningSection({
 
       setCurrentLine(index);
       const line = listening.dialogue[index];
-      const utt = new SpeechSynthesisUtterance(line.japanese);
-      utt.lang = "ja-JP";
-      if (jpVoice) utt.voice = jpVoice;
-      utt.rate = 0.85;
-
-      utt.onend = () => {
+      speakText(line.japanese, () => {
         lineIndexRef.current = index + 1;
         speakLine(index + 1);
-      };
-      utt.onerror = () => {
-        setIsPlaying(false);
-        setCurrentLine(-1);
-      };
-
-      utteranceRef.current = utt;
-      synth.speak(utt);
+      });
     }
 
     speakLine(0);
-  }, [isPlaying, listening.dialogue, stop]);
+  }, [isPlaying, listening.dialogue, stop, speakText]);
+
+  const replayLine = useCallback(
+    (index: number) => {
+      window.speechSynthesis.cancel();
+      setIsPlaying(true);
+      setCurrentLine(index);
+      speakText(listening.dialogue[index].japanese, () => {
+        setIsPlaying(false);
+        setCurrentLine(-1);
+      });
+    },
+    [listening.dialogue, speakText],
+  );
 
   return (
     <div className="animate-fade-in space-y-5">
@@ -135,9 +174,24 @@ export function ListeningSection({
       </h2>
 
       {/* Situation */}
-      <p className="text-kurodo-muted text-sm italic">
-        {listening.situation}
-      </p>
+      <p className="text-kurodo-muted text-sm italic">{listening.situation}</p>
+
+      {/* Speed selector */}
+      <div className="flex items-center gap-1 rounded-xl bg-kurodo-card border border-white/5 p-1">
+        {SPEED_OPTIONS.map((opt) => (
+          <button
+            key={opt.key}
+            onClick={() => setSpeed(opt.key)}
+            className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+              speed === opt.key
+                ? "bg-kurodo-red text-white"
+                : "text-kurodo-muted hover:text-white"
+            }`}
+          >
+            {speedLabels[opt.key]}
+          </button>
+        ))}
+      </div>
 
       {/* Play button */}
       <button
@@ -155,7 +209,12 @@ export function ListeningSection({
       >
         {isPlaying ? (
           <>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
               <rect x="6" y="4" width="4" height="16" rx="1" />
               <rect x="14" y="4" width="4" height="16" rx="1" />
             </svg>
@@ -163,7 +222,12 @@ export function ListeningSection({
           </>
         ) : (
           <>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
               <path d="M8 5v14l11-7z" />
             </svg>
             {t.playAudio}
@@ -171,7 +235,7 @@ export function ListeningSection({
         )}
       </button>
 
-      {/* Transcript (hidden by default) */}
+      {/* Transcript / Translation toggles */}
       <div className="flex gap-2">
         <button
           onClick={() => setShowTranscript(!showTranscript)}
@@ -201,19 +265,35 @@ export function ListeningSection({
           {listening.dialogue.map((line, i) => (
             <div
               key={i}
-              className={`transition-all duration-300 ${
+              className={`flex items-start gap-2 transition-all duration-300 ${
                 currentLine === i
                   ? "border-l-2 border-kurodo-red pl-3"
                   : "pl-4"
               }`}
             >
-              <span className="text-kurodo-gold text-xs font-medium">
-                {line.speaker}
-              </span>
-              <p className="text-white text-sm leading-relaxed">
-                {line.japanese}
-              </p>
-              <p className="text-kurodo-muted text-xs">{line.reading}</p>
+              <div className="flex-1">
+                <span className="text-kurodo-gold text-xs font-medium">
+                  {line.speaker}
+                </span>
+                <p className="text-white text-sm leading-relaxed">
+                  {line.japanese}
+                </p>
+                <p className="text-kurodo-muted text-xs">{line.reading}</p>
+              </div>
+              <button
+                onClick={() => replayLine(i)}
+                className="mt-1 shrink-0 w-7 h-7 rounded-full bg-kurodo-deep/50 border border-white/10 hover:border-kurodo-red/40 flex items-center justify-center transition-all duration-200 text-kurodo-muted hover:text-white"
+                title={t.replayLine}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
             </div>
           ))}
         </div>
